@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Filament\Widgets;
+
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+use App\Models\Song;
+use App\Models\Album;
+use App\Models\Band;
+use App\Models\User;
+
+class UserOverviewWidget extends BaseWidget {
+    public User $record; // Filament automatically passes the user being viewed
+
+    protected function getStats(): array {
+        $user = $this->record; // Get the user from the View page
+
+        return [
+            Stat::make('Total Songs', Song::where('user_id', $user->id)->count()),
+            Stat::make('Total Albums', Album::where('user_id', $user->id)->count()),
+            Stat::make('Band', optional($user->band()->first())->name ?? 'N/A'),
+        ];
+    }
+}

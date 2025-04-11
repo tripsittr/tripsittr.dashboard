@@ -1,0 +1,12 @@
+<x-filament-widgets::widget>
+    <x-filament::section
+        collapsible
+        collapsed
+        persist-collapsed
+        id="user-details"
+    >
+        <div>
+            @livewire(\App\Filament\Widgets\DashboardCalendar::class)
+        </div>
+    </x-filament::section>
+</x-filament-widgets::widget>

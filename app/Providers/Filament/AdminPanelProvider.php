@@ -1,0 +1,143 @@
+<?php
+
+namespace App\Providers\Filament;
+
+use App\Filament\Pages\Dashboard;
+use App\Filament\Pages\Partners;
+use App\Filament\Pages\Tenancy\EditTeamProfile;
+use App\Filament\Pages\Tenancy\RegisterTeam;
+use App\Filament\Widgets\AlbumSongCountStats;
+use App\Filament\Widgets\CollapsibleContainerWidget;
+use App\Filament\Widgets\DashboardCalendar;
+use App\Filament\Pages\InstagramAnalytics;
+use App\Models\Album;
+use App\Models\Team;
+use Awcodes\Overlook\OverlookPlugin;
+use Awcodes\Recently\RecentlyPlugin;
+use Filament\Facades\Filament;
+use Filament\Http\Middleware\Authenticate;
+use Filament\Http\Middleware\AuthenticateSession;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
+use Filament\Pages;
+use Filament\Pages\Dashboard as PagesDashboard;
+use Filament\Panel;
+use Filament\PanelProvider;
+use Filament\Widgets;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Maartenpaauw\Filament\Cashier\Stripe\BillingProvider;
+use Devonab\FilamentEasyFooter\EasyFooterPlugin;
+use Filament\Navigation\NavigationGroup;
+use Filament\View\LegacyComponents\Widget;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
+use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
+
+class AdminPanelProvider extends PanelProvider {
+    public function panel(Panel $panel): Panel {
+        $user = Auth::user();
+        $teamType = null;
+
+        if ($user) {
+            $team = $user->teams->first();
+            if ($team) {
+                $teamType = $team->type;
+            }
+        }
+
+        return $panel
+            ->default()
+            ->id('admin')
+            ->path('')
+            ->databaseNotifications()
+            ->tenantBillingProvider(new BillingProvider('solo_artist'))
+            ->tenantProfile(EditTeamProfile::class)
+            ->tenantRegistration(RegisterTeam::class)
+            ->tenant(Team::class)
+            ->registration()
+            ->plugins([
+                OverlookPlugin::make()
+                    ->sort(2)
+                    ->excludes(
+                        [
+                            \App\Filament\Resources\TeamResource::class,
+                            \App\Filament\Resources\UserResource::class,
+                        ]
+                    ),
+                FilamentFullCalendarPlugin::make()
+                    ->selectable()
+                    ->editable(),
+                EasyFooterPlugin::make()
+                    ->withFooterPosition('footer')
+                    ->withLinks([
+                        ['title' => 'Privacy Policy', 'url' => 'https://tripsittr.com/privacy-policy'],
+                        ['title' => 'Terms of Service', 'url' => 'https://tripsittr.com/terms-of-service'],
+                    ])
+                    ->withLoadTime('This page loaded in')
+                    ->withFooterPosition('sidebar.footer')
+                    ->withBorder(true),
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('Music')
+                    ->icon('heroicon-s-musical-note'),
+                NavigationGroup::make()
+                    ->label('Planning & Events')
+                    ->icon('heroicon-s-calendar-days'),
+                NavigationGroup::make()
+                    ->label('Social Media')
+                    ->icon('heroicon-s-chat-bubble-left-right'),
+                NavigationGroup::make()
+                    ->label('Analytics')
+                    ->icon('heroicon-s-chart-pie'),
+                NavigationGroup::make()
+                    ->label('Partners')
+                    ->icon('heroicon-s-globe-alt'),
+                NavigationGroup::make()
+                    ->label('Administration')
+                    ->icon('heroicon-s-lock-closed'),
+            ])
+            ->brandLogo(asset('Tripsittr Logo.png'))
+            ->favicon(asset('Tripsittr Record Logo.png'))
+            ->tenantMenuItems([
+                'register' => MenuItem::make()->label('Register New Team')
+                    ->visible(fn(): bool => $teamType !== 'Admin'),
+                'profile' => MenuItem::make()->label('Edit Team Profile'),
+            ])
+            ->brandLogoHeight('3rem')
+            ->login()
+            ->topNavigation(false)
+            ->colors([
+                'primary' => '#C75D5D',
+            ])
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->pages([
+                Dashboard::class,
+                InstagramAnalytics::class,
+            ])
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->widgets([])
+            ->middleware([
+                EncryptCookies::class,
+                AddQueuedCookiesToResponse::class,
+                StartSession::class,
+                AuthenticateSession::class,
+                ShareErrorsFromSession::class,
+                VerifyCsrfToken::class,
+                SubstituteBindings::class,
+                DisableBladeIconComponents::class,
+                DispatchServingFilamentEvent::class,
+            ])
+            ->authMiddleware([
+                Authenticate::class,
+            ]);
+    }
+}
