@@ -1,31 +1,17 @@
 <x-filament-panels::page>
-    <div class="instagram-feed">
-        <h2>Instagram Feed</h2>
-        <div class="posts">
-            @foreach ($posts as $post)
-                <div class="post">
-                    <img src="{{ $post['media_url'] }}" alt="Instagram Post">
-                    <p>{{ $post['caption'] ?? 'No caption available' }}</p>
-                </div>
-            @endforeach
+    @if (session('success'))
+        <div class="mb-4 p-4 bg-green-100 text-green-800 rounded">
+            {{ session('success') }}
         </div>
-    </div>
+    @endif
 
-    <!-- Add some basic styling -->
-    <style>
-        .instagram-feed .posts {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        .instagram-feed .post {
-            border: 1px solid #ddd;
-            padding: 8px;
-            max-width: 200px;
-        }
-        .instagram-feed .post img {
-            max-width: 100%;
-            height: auto;
-        }
-    </style>
+    <div class="flex flex-col items-center justify-center space-y-4">
+        <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200">Link Your Facebook Account</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+            Connect your Facebook account to view posts and analytics.
+        </p>
+        <a href="{{ route('facebook.link') }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            Link Facebook Account
+        </a>
+    </div>
 </x-filament-panels::page>

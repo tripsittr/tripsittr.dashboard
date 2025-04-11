@@ -20,6 +20,7 @@
         "james-heinrich/getid3": "^1.9",
         "laravel/cashier": "^15.6",
         "laravel/framework": "^11.31",
+        "laravel/socialite": "^5.19",
         "laravel/tinker": "^2.9",
         "maartenpaauw/filament-cashier-billing-provider": "^2.2",
         "phpsa/filament-dadjokes": "^2.0",

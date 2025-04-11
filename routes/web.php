@@ -5,16 +5,33 @@ use App\Http\Controllers\VenueController;
 use App\Http\Controllers\InstagramController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Laravel\Socialite\Facades\Socialite;
 
 Route::delete('/venue/{id}', [VenueController::class, 'destroy'])->name('venue.destroy');
 Route::post('/venues/{venue}/share', [VenueController::class, 'share'])->name('venue.share');
 
-Route::get('/instagram/redirect', [InstagramController::class, 'redirectToInstagram'])->name('instagram.redirect');
-Route::get('/instagram/callback', [InstagramController::class, 'handleCallback'])->name('instagram.callback');
+Route::get('/auth/facebook', function () {
+    return Socialite::driver('facebook')->redirect();
+})->name('facebook.link');
 
-Route::get('/instagram/login', [InstagramController::class, 'redirectToInstagram'])->name('instagram.login');
-Route::get('/instagram/callback', [InstagramController::class, 'handleInstagramCallback'])->name('instagram.callback');
-Route::get('/instagram/analytics', [InstagramController::class, 'fetchAnalytics'])->name('instagram.analytics');
+Route::get(
+    '/auth/facebook/callback',
+    function () {
+        $user = Socialite::driver('facebook')->user();
+
+        // Save the tokens to the database
+        auth()->user()->integrations()->updateOrCreate(
+            ['service' => 'facebook'],
+            [
+                'access_token' => $user->token,
+                'refresh_token' => $user->refreshToken ?? null,
+                'expires_at' => now()->addSeconds($user->expiresIn),
+            ]
+        );
+
+        return redirect()->route('filament.pages.instagram-social-page')->with('success', 'facebook account linked successfully!');
+    }
+);
 
 Route::get('/subscribe', function (Request $request) {
     return $request->user()
