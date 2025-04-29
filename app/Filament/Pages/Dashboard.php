@@ -5,7 +5,8 @@ namespace App\Filament\Pages;
 use Filament\Pages\Dashboard as PagesDashboard;
 use App\Filament\Widgets\AlbumSongCountStats;
 use App\Filament\Widgets\DashboardCalendar;
-use Awcodes\Overlook\Widgets\OverlookWidget;
+use App\Filament\Widgets\DashboardMusicForArtists;
+use App\Filament\Widgets\SpacerWidget;
 use Filament\Widgets\AccountWidget;
 
 class Dashboard extends PagesDashboard {
@@ -23,6 +24,8 @@ class Dashboard extends PagesDashboard {
     protected function getHeaderWidgets(): array {
         return [
             AccountWidget::class,
+            SpacerWidget::class,
+            DashboardMusicForArtists::class,
             AlbumSongCountStats::class,
             DashboardCalendar::class,
         ];
