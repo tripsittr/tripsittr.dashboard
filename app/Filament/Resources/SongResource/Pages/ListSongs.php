@@ -10,20 +10,10 @@ use Filament\Resources\Pages\ListRecords;
 
 class ListSongs extends ListRecords {
     protected static string $resource = SongResource::class;
-    // protected static string $view = 'filament.pages.list-songs';
 
-    // protected function getHeaderActions(): array {
-    //     return [
-    //         Actions\CreateAction::make()
-    //             ->label('New Song')
-    //             ->icon('heroicon-s-plus')
-    //             ->url(fn() => SongResource::getUrl('create')),
-    //     ];
-    // }
-
-    // public function getViewData(): array {
-    //     return [
-    //         'songs' => Song::latest()->get(),
-    //     ];
-    // }
+    protected function getHeaderActions(): array {
+        return [
+            Actions\CreateAction::make(),
+        ];
+    }
 }

@@ -8,6 +8,7 @@ use App\Filament\Resources\KnowledgeResource\RelationManagers;
 use App\Models\Knowledge;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Grid as ComponentsGrid;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\MarkdownEntry;
 use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\Section;
 use Filament\Infolists\Infolist;
 use Filament\Tables\Columns\Layout\Grid;
 use Filament\Tables\Columns\Layout\Stack;
@@ -148,26 +150,32 @@ class KnowledgeResource extends Resource {
                     ->markdown()
                     ->label('')
                     ->columnSpanFull(),
-                TextEntry::make('type')
-                    ->badge()
-                    ->label('Type'),
-                TextEntry::make('status')
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'Draft' => 'gray',
-                        'Published' => 'success',
-                        'Archived' => 'warning',
-                    })
-                    ->label('Status'),
-                TextEntry::make('author')
-                    ->badge()
-                    ->label('Author'),
-                TextEntry::make('source')
-                    ->badge()
-                    ->label('Source'),
-                TextEntry::make('source_url')
-                    ->badge()
-                    ->label('Source URL'),
+                Section::make('Details')
+                    ->schema([
+                        ComponentsGrid::make(3)
+                            ->schema([
+                                TextEntry::make('type')
+                                    ->badge()
+                                    ->label('Type'),
+                                TextEntry::make('status')
+                                    ->badge()
+                                    ->color(fn(string $state): string => match ($state) {
+                                        'Draft' => 'gray',
+                                        'Published' => 'success',
+                                        'Archived' => 'warning',
+                                    })
+                                    ->label('Status'),
+                                TextEntry::make('author')
+                                    ->badge()
+                                    ->label('Author'),
+                                TextEntry::make('source')
+                                    ->badge()
+                                    ->label('Source'),
+                                TextEntry::make('source_url')
+                                    ->badge()
+                                    ->label('Source URL'),
+                            ]),
+                    ]),
             ]);
     }
 

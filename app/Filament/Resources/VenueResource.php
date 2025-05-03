@@ -233,6 +233,9 @@ class VenueResource extends Resource {
                                 'Private Box' => 'Private Box',
                                 'VIP Seating' => 'VIP Seating',
                                 'Pit' => 'Pit',
+                                'Tables' => 'Tables',
+                                'Bar' => 'Bar',
+                                'Lawn' => 'Lawn',
                             ])->nullable(),
                         Forms\Components\Select::make('parking_info')
                             ->label('Parking Information')
