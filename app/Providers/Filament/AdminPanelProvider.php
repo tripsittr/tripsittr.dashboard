@@ -57,6 +57,7 @@ class AdminPanelProvider extends PanelProvider {
             ->default()
             ->id('admin')
             ->path('')
+            ->topNavigation(true)
             ->databaseNotifications()
             ->tenantBillingProvider(new BillingProvider('solo_artist'))
             ->tenantProfile(EditTeamProfile::class)
@@ -90,7 +91,7 @@ class AdminPanelProvider extends PanelProvider {
                     ->label('Music')
                     ->icon('heroicon-s-musical-note'),
                 NavigationGroup::make()
-                    ->label('Planning & Events')
+                    ->label('Events')
                     ->icon('heroicon-s-calendar-days'),
                 NavigationGroup::make()
                     ->label('Social Media')
@@ -103,7 +104,7 @@ class AdminPanelProvider extends PanelProvider {
                     ->icon('heroicon-s-globe-alt'),
                 NavigationGroup::make()
                     ->label('Administration')
-                    ->icon('heroicon-s-lock-closed'),
+                    ->icon('heroicon-s-lock-closed')
             ])
             ->brandLogo(asset('Tripsittr Logo.png'))
             ->favicon(asset('Tripsittr Record Logo.png'))
@@ -114,12 +115,12 @@ class AdminPanelProvider extends PanelProvider {
             ])
             ->brandLogoHeight('3rem')
             ->login()
-            ->topNavigation(false)
             ->colors([
                 'primary' => '#C75D5D',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->pages([
                 Dashboard::class,
             ])

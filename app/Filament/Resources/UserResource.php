@@ -33,6 +33,13 @@ class UserResource extends Resource {
     protected static ?string $navigationGroup = 'Administration';
     protected static ?int $navigationSort = 15;
 
+    public static function shouldRegisterNavigation(): bool {
+        if (Auth::user()->type === 'admin') {
+            return true;
+        }
+        return false;
+    }
+
     public static function form(Form $form): Form {
         $user = Auth::user();
         return $form

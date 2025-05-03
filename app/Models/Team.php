@@ -23,6 +23,10 @@ class Team extends Model {
         return $this->hasMany(Album::class);
     }
 
+    public function InventoryItems(): HasMany {
+        return $this->hasMany(InventoryItem::class);
+    }
+
     public function users() {
         return $this->belongsToMany(User::class, 'team_user');
     }

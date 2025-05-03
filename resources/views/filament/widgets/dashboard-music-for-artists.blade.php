@@ -1,7 +1,16 @@
 <x-filament-widgets::widget>
     <x-filament::section>
         <h3 class="font-semibold">Websites for Artists</h3>
-        <p class="text-sm text-gray-500">Visit the websites below to manage your music and profiles on their platforms once you have released your first Song, Album, or EP.</p><br>
+        <p class="text-sm text-gray-500">Visit the websites below to view analytics for each platform, manage your music and profiles, and find additional resources for each once you have released your first Song, Album, or EP.</p><br>
+        <div class="items-center mb-3">
+            <x-filament::button
+                outlined
+                href="{{ env('app_url') }}{{ Filament\Facades\Filament::getTenant()->id }}/knowledge/knowledge/artist-platforms-explained"
+                tag="a"
+                >
+                Learn More
+            </x-filament::button>
+        </div><br>
         <div class="flex flex-row justify-between items-center gap-2">
             <x-filament::icon-button
                 icon="si-spotify"

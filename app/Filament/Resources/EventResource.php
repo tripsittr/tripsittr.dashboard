@@ -14,7 +14,7 @@ use Filament\Tables\Table;
 class EventResource extends Resource {
     protected static ?string $model = Event::class;
 
-    protected static ?string $navigationGroup = 'Planning & Events';
+    protected static ?string $navigationGroup = 'Events';
 
     public static function getWidgets(): array {
         return [

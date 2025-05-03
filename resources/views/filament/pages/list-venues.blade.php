@@ -16,7 +16,7 @@
                 <x-filament::card class="bg-white dark:bg-gray-800" style="box-shadow:;">
                     <div class="flex justify-between items-start">
                         <h2 class="text-xl font-bold mb-4 text-primary-500 dark:text-primary-300">
-                            <a href="{{ route('filament.admin.resources.venues.view', ['tenant' => $tenant->id, 'record' => $venue->id]) }}" class="text-primary-500 dark:text-primary-300 hover:underline">
+                            <a href="{{ route('filament.admin.knowledge.resources.venues.view', ['tenant' => $tenant->id, 'record' => $venue->id]) }}" class="text-primary-500 dark:text-primary-300 hover:underline">
                                 {{ $venue->name }}
                             </a>
                         </h2>
@@ -29,7 +29,7 @@
                             <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10">
                                 <ul class="py-1 rounded-md bg-white dark:bg-gray-800">
                                     <li>
-                                        <a href="{{ route('filament.admin.resources.venues.edit', ['tenant' => $tenant->id, 'record' => $venue->id]) }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-white no-underline hover:underline">Edit</a>
+                                        <a href="{{ route('filament.admin.knowledge.resources.venues.edit', ['tenant' => $tenant->id, 'record' => $venue->id]) }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-white no-underline hover:underline">Edit</a>
                                     </li>
                                     <li>
                                         <form method="POST" action="{{ route('venue.destroy', $venue->id) }}" onsubmit="return confirm('Are you sure you want to delete this venue?');">

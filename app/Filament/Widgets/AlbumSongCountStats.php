@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use App\Models\Album;
+use App\Models\Event;
 use App\Models\InventoryItem;
 use App\Models\Song;
 use Filament\Facades\Filament;
@@ -21,6 +22,7 @@ class AlbumSongCountStats extends BaseWidget {
             Stat::make('Albums', Album::where('team_id', $activeTeamId)->count()),
             Stat::make('Songs', Song::where('team_id', $activeTeamId)->count()),
             Stat::make('Inventory', InventoryItem::where('team_id', $activeTeamId)->count()),
+            Stat::make('Events', Event::where('team_id', $activeTeamId)->count()),
         ];
     }
 }

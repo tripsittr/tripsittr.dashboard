@@ -8,8 +8,11 @@ use App\Models\Inventory;
 use App\Models\InventoryItem;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -32,15 +35,22 @@ class InventoryResource extends Resource {
     public static function form(Form $form): Form {
         return $form
             ->schema([
-                Section::make('Product Details')
+                Grid::make(4)
                     ->schema([
-                        TextInput::make('sku')->required(),
-                        TextInput::make('batch_number')->nullable(),
-                        TextInput::make('barcode')->nullable(),
-                        TextInput::make('name')->required(),
-                        Textarea::make('description')->nullable(),
-                        TextInput::make('color')->nullable(),
-                        TextInput::make('material')->nullable(),
+                        Section::make('Product Details')
+                            ->schema([
+                                TextInput::make('name')->required(),
+                                Textarea::make('description')->nullable(),
+                                TextInput::make('color')->nullable(),
+                                TextInput::make('material')->nullable(),
+                            ])->columnSpan(3),
+                        Section::make('Product Codes')
+                            ->description('Product codes can be generated from the action menu. A barcode can be generated once a SKU and Batch have been entered and saved.')
+                            ->schema([
+                                TextInput::make('sku')->required(),
+                                TextInput::make('batch_number')->nullable(),
+                                TextInput::make('barcode')->nullable(),
+                            ])->columnSpan(1),
                     ]),
                 Section::make('Product Image')
                     ->schema([
@@ -49,25 +59,38 @@ class InventoryResource extends Resource {
                             ->directory('inventory-images')
                             ->nullable(),
                     ]),
-                Section::make('Pricing & Stock')
+                Tabs::make()
                     ->schema([
-                        TextInput::make('price')->numeric()->nullable(),
-                        TextInput::make('cost')->numeric()->nullable(),
-                        TextInput::make('stock')->numeric()->rules(['min:0']),
-                        TextInput::make('low_stock_threshold')->numeric()->nullable(),
-                    ]),
-                Section::make('Dimensions & Weight')
-                    ->schema([
-                        TextInput::make('length')->numeric()->nullable(),
-                        TextInput::make('width')->numeric()->nullable(),
-                        TextInput::make('height')->numeric()->nullable(),
-                        Select::make('dims_unit')->options(['cm' => 'cm', 'in' => 'in', 'mm' => 'mm', 'ft' => 'ft', 'm' => 'm'])->nullable(),
-                        TextInput::make('weight')->numeric()->nullable(),
-                        Select::make('weight_unit')->options(['kg' => 'kg', 'lbs' => 'lbs'])->nullable(),
-                        Select::make('size')->options(['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'])->nullable(),
-                    ]),
+                        Tab::make('Pricing & Stock')
+                            ->schema([
+                                Grid::make()
+                                    ->schema([
+                                        TextInput::make('price')->numeric()->nullable()
+                                            ->hintIcon('heroicon-m-question-mark-circle', tooltip: 'Price you sell an item for.'),
+                                        TextInput::make('cost')->numeric()->nullable()
+                                            ->hintIcon('heroicon-m-question-mark-circle', tooltip: 'Cost to manufacture an item.'),
+                                        TextInput::make('stock')->numeric()->rules(['min:0'])->required(),
+                                        TextInput::make('low_stock_threshold')->numeric()->nullable()->required()
+                                            ->hintIcon('heroicon-m-question-mark-circle', tooltip: 'When your stock reaches this level, you will be notified.')
+                                    ]),
+                            ]),
+                        Tab::make('Dimensions & Weight')
+                            ->schema([
+                                Grid::make()
+                                    ->schema([
+                                        TextInput::make('length')->numeric()->nullable(),
+                                        TextInput::make('width')->numeric()->nullable(),
+                                        TextInput::make('height')->numeric()->nullable(),
+                                        Select::make('dims_unit')->options(['cm' => 'cm', 'in' => 'in', 'mm' => 'mm', 'ft' => 'ft', 'm' => 'm'])->nullable(),
+                                        TextInput::make('weight')->numeric()->nullable(),
+                                        Select::make('weight_unit')->options(['kg' => 'kg', 'lbs' => 'lbs'])->nullable(),
+                                        Select::make('size')->options(['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'])->nullable(),
+                                    ]),
+                            ]),
+                    ])->columnSpanFull(),
             ]);
     }
+
 
     public static function table(Table $table): Table {
         return $table

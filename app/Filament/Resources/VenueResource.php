@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\Knowledge;
 use App\Filament\Resources\VenueResource\Pages;
 use App\Filament\Resources\VenueResource\RelationManagers;
 use App\Models\Venue;
@@ -17,6 +18,7 @@ use Filament\Infolists\Components\Tabs as InfolistTabs;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -29,6 +31,8 @@ class VenueResource extends Resource {
     protected static ?string $model = Venue::class;
     protected static bool $isScopedToTenant = false;
     protected static ?string $navigationIcon = 'heroicon-s-rectangle-stack';
+
+    protected static ?string $cluster = Knowledge::class;
 
     public static function form(Form $form): Form {
         return $form
@@ -534,13 +538,18 @@ class VenueResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
-            ->recordUrl(fn(Venue $record): string => route('filament.admin.resources.venues.view', ['record' => $record, 'tenant' => Auth::user()->teams->first()->id]),)
+            ->recordUrl(fn(Venue $record): string => route('filament.admin.knowledge.resources.venues.view', ['record' => $record, 'tenant' => Auth::user()->teams->first()->id]),)
             ->columns([
-                TextColumn::make('name')->sortable()->searchable()
-                    ->description(fn(Venue $record): string => $record->address_1 . ' ' . $record->city . ' ' . $record->state . ' ' . $record->zip),
-                TextColumn::make('phone')->sortable()->searchable(),
-                TextColumn::make('email')->sortable()->searchable(),
-                TextColumn::make('url')->sortable()->searchable(),
+                Stack::make([
+                    TextColumn::make('name')->sortable()->searchable()
+                        ->description(fn(Venue $record): string => $record->address_1 . ' ' . $record->city . ' ' . $record->state . ' ' . $record->zip),
+                    TextColumn::make('phone')->sortable()->searchable(),
+                    TextColumn::make('email')->sortable()->searchable(),
+                    TextColumn::make('url')->sortable()->searchable(),
+                ])
+            ])
+            ->contentGrid([
+                'md' => 2,
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
