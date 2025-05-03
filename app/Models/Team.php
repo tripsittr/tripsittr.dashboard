@@ -13,7 +13,8 @@ use App\Traits\BlacklistedWordsTrait;
 class Team extends Model {
     use HasFactory, Billable, BlacklistedWordsTrait;
 
-    protected $fillable = ['name', 'type', 'members'];
+    protected $fillable = ['name', 'type', 'members', 'team_avatar', 'formation_date', 'genre', 'website', 'instagram', 'twitter', 'facebook', 'youtube', 'email', 'phone'];
+
 
     public function songs(): HasMany {
         return $this->hasMany(Song::class);
