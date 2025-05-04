@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Clusters\Knowledge\Resources;
 
 use App\Filament\Clusters\Knowledge as ClustersKnowledge;
-use App\Filament\Resources\KnowledgeResource\Pages;
-use App\Filament\Resources\KnowledgeResource\RelationManagers;
+use App\Filament\Clusters\Knowledge\Resources\KnowledgeResource\Pages;
 use App\Models\Knowledge;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,17 +11,11 @@ use Filament\Infolists\Components\Grid as ComponentsGrid;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\MarkdownEntry;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Infolist;
-use Filament\Tables\Columns\Layout\Grid;
 use Filament\Tables\Columns\Layout\Stack;
-use Illuminate\Support\HtmlString;
 
 class KnowledgeResource extends Resource {
     protected static ?string $model = Knowledge::class;

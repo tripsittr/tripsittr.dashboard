@@ -34,7 +34,7 @@ class UserResource extends Resource {
     protected static ?int $navigationSort = 15;
 
     public static function shouldRegisterNavigation(): bool {
-        if (Auth::user()->type === 'admin') {
+        if (Filament::getTenant()->type === 'Admin') {
             return true;
         }
         return false;
@@ -69,7 +69,6 @@ class UserResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
-            // ->query(fn(Builder $query) => $query->where('tenant_id', Auth::user()->tenant_id))
             ->columns([
                 TextColumn::make('name')->label('Name'),
                 TextColumn::make('email')->label('Email'),

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\VenueResource\Pages;
+namespace App\Filament\Clusters\Knowledge\Resources\VenueResource\Pages;
 
-use App\Filament\Resources\VenueResource;
+use App\Filament\Clusters\Knowledge\Resources\VenueResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Awcodes\Recently\Concerns\HasRecentHistoryRecorder;

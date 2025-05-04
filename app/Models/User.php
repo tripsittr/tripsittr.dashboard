@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Traits\HasRoles;
 use App\Traits\BlacklistedWordsTrait;
+use Filament\Facades\Filament;
 
 class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenants {
     use HasFactory, Notifiable;
@@ -88,6 +89,11 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenant
     }
 
     public function scopeForTenant($query, $tenantId) {
+
+        if (Filament::getTenant()->type === 'Admin') {
+            return;
+        }
+
         return $query->where('tenant_id', $tenantId);
     }
 

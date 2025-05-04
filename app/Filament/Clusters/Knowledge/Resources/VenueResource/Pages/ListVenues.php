@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\VenueResource\Pages;
+namespace App\Filament\Clusters\Knowledge\Resources\VenueResource\Pages;
 
 use App\Filament\Imports\VenueImporter;
-use App\Filament\Resources\VenueResource;
+use App\Filament\Clusters\Knowledge\Resources\VenueResource;
 use App\Models\Venue;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;

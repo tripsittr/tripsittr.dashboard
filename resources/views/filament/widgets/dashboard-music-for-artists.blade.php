@@ -1,6 +1,10 @@
 <x-filament-widgets::widget>
-    <x-filament::section>
-        <h3 class="font-semibold">Websites for Artists</h3>
+    <x-filament::section collapsible>
+
+        <x-slot name="heading">
+            Websites for Artists
+        </x-slot>
+        
         <p class="text-sm text-gray-500">Visit the websites below to view analytics for each platform, manage your music and profiles, and find additional resources for each once you have released your first Song, Album, or EP.</p><br>
         <div class="items-center mb-3">
             <x-filament::button

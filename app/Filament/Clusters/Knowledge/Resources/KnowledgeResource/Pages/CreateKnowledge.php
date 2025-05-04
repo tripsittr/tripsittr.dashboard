@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\KnowledgeResource\Pages;
+namespace App\Filament\Clusters\Knowledge\Resources\KnowledgeResource\Pages;
 
-use App\Filament\Resources\KnowledgeResource;
+use App\Filament\Clusters\Knowledge\Resources\KnowledgeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 

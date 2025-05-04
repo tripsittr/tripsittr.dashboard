@@ -62,6 +62,7 @@ class AdminPanelProvider extends PanelProvider {
             ->tenantBillingProvider(new BillingProvider('solo_artist'))
             ->tenantProfile(EditTeamProfile::class)
             ->tenantRegistration(RegisterTeam::class)
+            ->unsavedChangesAlerts()
             ->tenant(Team::class)
             ->registration()
             ->plugins([
@@ -107,7 +108,7 @@ class AdminPanelProvider extends PanelProvider {
                     ->icon('heroicon-s-lock-closed')
             ])
             ->brandLogo(asset('Tripsittr Logo.png'))
-            ->favicon(asset('Tripsittr Record Logo.png'))
+            ->favicon(asset('Tripsittr Logo Record.png'))
             ->tenantMenuItems([
                 'register' => MenuItem::make()->label('Register New Team')
                     ->visible(fn(): bool => $teamType !== 'Admin'),
