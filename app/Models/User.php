@@ -88,15 +88,6 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenant
         ];
     }
 
-    public function scopeForTenant($query, $tenantId) {
-
-        if (Filament::getTenant()->type === 'Admin') {
-            return;
-        }
-
-        return $query->where('tenant_id', $tenantId);
-    }
-
     public function getBlacklistedFields(): array {
         return array_merge($this->fillable, ['name', 'description']);
     }

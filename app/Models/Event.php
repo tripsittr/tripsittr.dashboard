@@ -25,4 +25,10 @@ class Event extends Model {
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
     ];
+
+
+    public function scopeForTenant($query, $tenantId) {
+
+        return $query->where('team_id', $tenantId);
+    }
 }
