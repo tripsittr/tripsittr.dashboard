@@ -32,6 +32,10 @@ class Team extends Model {
         return $this->belongsToMany(User::class, 'team_user');
     }
 
+    public function events(): HasMany{
+        return $this->hasMany(Event::class);
+    }
+
     public function scopeForTenant($query, $tenantId) {
         return $query->where('tenant_id', $tenantId);
     }
