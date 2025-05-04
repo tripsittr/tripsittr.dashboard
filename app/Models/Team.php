@@ -33,7 +33,7 @@ class Team extends Model {
     }
 
     public function events(): HasMany{
-        return $this->hasMany(Event::class);
+        return $this->hasMany(Event::class, 'team_id');
     }
 
     public function scopeForTenant($query, $tenantId) {
