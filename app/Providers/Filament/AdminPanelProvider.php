@@ -107,8 +107,8 @@ class AdminPanelProvider extends PanelProvider {
                     ->label('Administration')
                     ->icon('heroicon-s-lock-closed')
             ])
-            ->brandLogo(asset('public/Tripsittr Logo.png'))
-            ->favicon(asset('public/Tripsittr Logo Record.png'))
+            ->brandLogo(asset('/storage/Tripsittr Logo.png'))
+            ->favicon(asset('/storage/Tripsittr Logo Record.png'))
             ->tenantMenuItems([
                 'register' => MenuItem::make()->label('Register New Team')
                     ->visible(fn(): bool => $teamType !== 'Admin'),
