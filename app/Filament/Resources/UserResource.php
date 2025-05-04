@@ -30,6 +30,8 @@ class UserResource extends Resource {
 
     protected static ?string $tenantOwnershipRelationshipName = 'teams';
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $navigationGroup = 'Administration';
     protected static ?int $navigationSort = 15;
 

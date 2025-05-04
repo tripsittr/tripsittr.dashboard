@@ -50,6 +50,7 @@ class SongResource extends Resource {
     protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationGroup = 'Music';
+    protected static bool $isScopedToTenant = true;
 
     public static function extractMetadata($filePath, callable $set) {
         if (!$filePath) return;

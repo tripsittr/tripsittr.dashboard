@@ -31,6 +31,7 @@ class InventoryResource extends Resource {
     protected static ?string $navigationIcon = 'heroicon-s-archive-box';
     protected static ?string $navigationLabel = 'Inventory';
     protected static ?int $navigationSort = 3;
+    protected static bool $isScopedToTenant = true;
 
     public static function form(Form $form): Form {
         return $form

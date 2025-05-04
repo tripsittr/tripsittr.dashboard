@@ -16,6 +16,8 @@ class EventResource extends Resource {
 
     protected static ?string $navigationGroup = 'Events';
 
+    protected static bool $isScopedToTenant = true;
+
     public static function getWidgets(): array {
         return [
             DashboardCalendar::class,

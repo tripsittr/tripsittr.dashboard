@@ -26,6 +26,7 @@ class AlbumResource extends Resource {
     protected static ?string $navigationGroup = 'Music';
 
     protected static ?int $navigationSort = 1;
+    protected static bool $isScopedToTenant = true;
 
     public static function form(Form $form): Form {
         return $form
