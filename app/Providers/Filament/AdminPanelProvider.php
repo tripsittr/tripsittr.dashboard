@@ -101,7 +101,7 @@ class AdminPanelProvider extends PanelProvider {
                     ->label('Analytics')
                     ->icon('heroicon-s-chart-pie'),
                 NavigationGroup::make()
-                    ->label('Partners')
+                    ->label('Partners') 
                     ->icon('heroicon-s-globe-alt'),
                 NavigationGroup::make()
                     ->label('Administration')
