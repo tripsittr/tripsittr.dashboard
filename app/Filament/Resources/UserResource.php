@@ -32,15 +32,15 @@ class UserResource extends Resource {
 
     protected static bool $isScopedToTenant = false;
 
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     protected static ?string $navigationGroup = 'Administration';
     protected static ?int $navigationSort = 15;
 
-    public static function shouldRegisterNavigation(): bool {
-        if (Filament::getTenant()->type === 'Admin') {
-            return true;
-        }
-        return false;
-    }
 
     public static function form(Form $form): Form {
         $user = Auth::user();
@@ -52,7 +52,9 @@ class UserResource extends Resource {
                 TextInput::make('email')
                     ->email()
                     ->required(),
-
+                TextInput::make('type')
+                    ->visible(Filament::getTenant()->type == 'Admin')
+                    ->disabled(Filament::getTenant()->type !== 'Admin'),
                 TextInput::make('password')
                     ->label('Password')
                     ->password()

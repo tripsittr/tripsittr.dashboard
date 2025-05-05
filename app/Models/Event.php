@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,6 +29,10 @@ class Event extends Model {
 
 
     public function scopeForTenant($query, $tenantId) {
+    
+        if (Filament::getTenant()->type == 'Admin') {
+            return;
+        }
 
         return $query->where('team_id', $tenantId);
     }

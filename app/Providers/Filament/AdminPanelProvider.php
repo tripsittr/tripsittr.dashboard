@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Clusters\Knowledge;
+use App\Filament\Clusters\Knowledge\Resources\KnowledgeResource;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\Partners;
 use App\Filament\Pages\Tenancy\EditTeamProfile;
@@ -10,6 +12,7 @@ use App\Filament\Widgets\AlbumSongCountStats;
 use App\Filament\Widgets\CollapsibleContainerWidget;
 use App\Filament\Widgets\DashboardCalendar;
 use App\Filament\Pages\InstagramAnalytics;
+use App\Filament\Resources\UserResource;
 use App\Filament\Widgets\DashboardMusicForArtists;
 use App\Models\Album;
 use App\Models\Team;
@@ -37,7 +40,9 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Maartenpaauw\Filament\Cashier\Stripe\BillingProvider;
 use Devonab\FilamentEasyFooter\EasyFooterPlugin;
 use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
 use Filament\View\LegacyComponents\Widget;
+use Illuminate\Validation\Rules\Exists;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 
@@ -47,10 +52,7 @@ class AdminPanelProvider extends PanelProvider {
         $teamType = null;
 
         if ($user) {
-            $team = $user->teams->first();
-            if ($team) {
-                $teamType = $team->type;
-            }
+            $teamType = Filament::getTenant()->type;
         }
 
         return $panel
@@ -64,7 +66,7 @@ class AdminPanelProvider extends PanelProvider {
             ->tenantRegistration(RegisterTeam::class)
             ->unsavedChangesAlerts()
             ->tenant(Team::class)
-            ->registration()
+            // ->registration()
             ->plugins([
                 OverlookPlugin::make()
                     ->sort(2)
@@ -108,13 +110,24 @@ class AdminPanelProvider extends PanelProvider {
                     ->icon('heroicon-s-lock-closed')
             ])
             ->brandLogo(asset('/storage/Tripsittr Logo.png'))
+            ->brandLogoHeight('2.75rem')
             ->favicon(asset('/storage/Tripsittr Logo Record.png'))
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label('Knowledge')
+                    ->url(fn(): string => KnowledgeResource::getUrl())
+                    ->icon('fas-book'),
+                MenuItem::make()
+                    ->label('Users')
+                    ->url(fn(): string => UserResource::getUrl())
+                    ->visible(fn(): bool => Auth::user()->type == 'Admin')
+                    ->icon('heroicon-s-users'),
+            ])
             ->tenantMenuItems([
                 'register' => MenuItem::make()->label('Register New Team')
-                    ->visible(fn(): bool => $teamType !== 'Admin'),
+                    ->visible(fn(): bool => Auth::user()->type == 'Admin'),
                 'profile' => MenuItem::make()->label('Edit Team Profile'),
             ])
-            ->brandLogoHeight('3rem')
             ->login()
             ->colors([
                 'primary' => '#C75D5D',

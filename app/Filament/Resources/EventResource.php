@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EventResource\Pages;
 use App\Filament\Widgets\DashboardCalendar;
 use App\Models\Event;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,14 +16,9 @@ class EventResource extends Resource {
     protected static ?string $model = Event::class;
 
     protected static ?string $navigationGroup = 'Events';
+    protected static ?string $tenantOwnershipRelationshipName = 'team';
 
-    protected static bool $isScopedToTenant = true;
-
-    public static function getWidgets(): array {
-        return [
-            DashboardCalendar::class,
-        ];
-    }
+    // protected static bool $isScopedToTenant = true;
 
     public static function form(Form $form): Form {
         return $form
@@ -47,7 +43,7 @@ class EventResource extends Resource {
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('starts_at')->dateTime()->sortable(),
                 Tables\Columns\TextColumn::make('ends_at')->dateTime()->sortable(),
-                Tables\Columns\TextColumn::make('team.name')->label('Team'),
+                Tables\Columns\TextColumn::make('team.name')->label('Team')->visible(Filament::getTenant() == 'Admin'),
             ])
             ->filters([
                 // Add filters if needed

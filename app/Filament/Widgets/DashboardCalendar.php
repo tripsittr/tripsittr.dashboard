@@ -14,7 +14,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class DashboardCalendar extends FullCalendarWidget {
     public function fetchEvents(array $fetchInfo): array {
+
+        // if (Filament::getTenant()->type == 'Admin') {
+        //     return Event::whereBetween('starts_at', [$fetchInfo['start'], $fetchInfo['end']])
+        //         ->get()
+        //         ->map(fn(Event $event) => [
+        //             'id' => $event->id,
+        //             'title' => $event->name,
+        //             'start' => $event->starts_at->toIso8601String(),
+        //             'end' => $event->ends_at?->toIso8601String(),
+        //         ])
+        //         ->toArray();
+        // }
+
         return Event::whereBetween('starts_at', [$fetchInfo['start'], $fetchInfo['end']])
+            ->where('team_id', Filament::getTenant()->id)
             ->get()
             ->map(fn(Event $event) => [
                 'id' => $event->id,
