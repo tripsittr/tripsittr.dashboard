@@ -1,46 +1,27 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Clusters\Admin\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\Team;
+use App\Filament\Clusters\Admin;
+use App\Filament\Clusters\Admin\Resources\UserResource\Pages;
 use App\Models\User;
-use Filament\Tables\Actions\Action;
 use Filament\Facades\Filament;
-use Filament\Forms;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
-// use Spatie\Permission\Models\Role;
-// use Spatie\Permission\Models\Permission;
-// use Spatie\Permission\Traits\HasRoles;
 
 class UserResource extends Resource {
     protected static ?string $model = User::class;
 
     protected static ?string $tenantOwnershipRelationshipName = 'teams';
+    protected static ?string $navigationIcon = 'heroicon-s-users';
 
+    protected static ?string $cluster = Admin::class;
     protected static bool $isScopedToTenant = false;
-
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return false;
-    }
-
-    protected static ?string $navigationGroup = 'Administration';
-    protected static ?int $navigationSort = 15;
-
 
     public static function form(Form $form): Form {
         $user = Auth::user();

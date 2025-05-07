@@ -2,58 +2,42 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Clusters\Knowledge;
+use App\Filament\Clusters\Admin;
+use App\Filament\Clusters\Admin\Resources\UserResource;
 use App\Filament\Clusters\Knowledge\Resources\KnowledgeResource;
 use App\Filament\Pages\Dashboard;
+use App\Filament\Pages\ListTeamMembers;
 use App\Filament\Pages\Partners;
 use App\Filament\Pages\Tenancy\EditTeamProfile;
 use App\Filament\Pages\Tenancy\RegisterTeam;
-use App\Filament\Widgets\AlbumSongCountStats;
-use App\Filament\Widgets\CollapsibleContainerWidget;
-use App\Filament\Widgets\DashboardCalendar;
-use App\Filament\Pages\InstagramAnalytics;
-use App\Filament\Resources\UserResource;
 use App\Filament\Widgets\DashboardMusicForArtists;
-use App\Models\Album;
+use App\Http\Middleware\UpdateUserTeam;
 use App\Models\Team;
 use Awcodes\Overlook\OverlookPlugin;
-use Awcodes\Recently\RecentlyPlugin;
 use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
-use Filament\Pages;
-use Filament\Pages\Dashboard as PagesDashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Maartenpaauw\Filament\Cashier\Stripe\BillingProvider;
 use Devonab\FilamentEasyFooter\EasyFooterPlugin;
 use Filament\Navigation\NavigationGroup;
-use Filament\Navigation\NavigationItem;
-use Filament\View\LegacyComponents\Widget;
-use Illuminate\Validation\Rules\Exists;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
-use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 
 class AdminPanelProvider extends PanelProvider {
-    public function panel(Panel $panel): Panel {
-        $user = Auth::user();
-        $teamType = null;
 
-        if ($user) {
-            $teamType = Filament::getTenant()->type;
-        }
+    public function panel(Panel $panel): Panel {
+        $TeamID = null;
 
         return $panel
             ->default()
@@ -73,7 +57,7 @@ class AdminPanelProvider extends PanelProvider {
                     ->excludes(
                         [
                             \App\Filament\Resources\TeamResource::class,
-                            \App\Filament\Resources\UserResource::class,
+                            UserResource::class,
                         ]
                     ),
                 FilamentFullCalendarPlugin::make()
@@ -84,9 +68,9 @@ class AdminPanelProvider extends PanelProvider {
                     ->withLinks([
                         ['title' => 'Privacy Policy', 'url' => 'https://tripsittr.com/privacy-policy'],
                         ['title' => 'Terms of Service', 'url' => 'https://tripsittr.com/terms-of-service'],
+                        // ['title' => 'Partners', 'url' => ],
                     ])
                     ->withLoadTime('This page loaded in')
-                    ->withFooterPosition('sidebar.footer')
                     ->withBorder(true),
             ])
             ->navigationGroups([
@@ -118,15 +102,16 @@ class AdminPanelProvider extends PanelProvider {
                     ->url(fn(): string => KnowledgeResource::getUrl())
                     ->icon('fas-book'),
                 MenuItem::make()
-                    ->label('Users')
-                    ->url(fn(): string => UserResource::getUrl())
+                    ->label('Admin')
+                    ->url(fn(): string => Admin::getUrl())
                     ->visible(fn(): bool => Auth::user()->type == 'Admin')
-                    ->icon('heroicon-s-users'),
+                    ->icon('fas-lock'),
             ])
             ->tenantMenuItems([
                 'register' => MenuItem::make()->label('Register New Team')
                     ->visible(fn(): bool => Auth::user()->type == 'Admin'),
                 'profile' => MenuItem::make()->label('Edit Team Profile'),
+                'members' => MenuItem::make()->label('Manage Members')->url(fn(): string => ListTeamMembers::getUrl()),
             ])
             ->login()
             ->colors([
@@ -152,9 +137,15 @@ class AdminPanelProvider extends PanelProvider {
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                UpdateUserTeam::class,
             ])
+            // ->routeMiddleware([
+            //     'team' => UpdateUserTeam::class,
+            // ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+                UpdateUserTeam::class,
+            ]); 
+
     }
 }

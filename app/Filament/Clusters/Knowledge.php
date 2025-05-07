@@ -2,7 +2,6 @@
 
 namespace App\Filament\Clusters;
 
-use App\Filament\Resources\KnowledgeResource;
 use Filament\Clusters\Cluster;
 
 class Knowledge extends Cluster {

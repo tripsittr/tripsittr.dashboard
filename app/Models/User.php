@@ -25,6 +25,15 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenant
     use HasRoles;
     use BlacklistedWordsTrait;
 
+    public function getDefaultTenant(Panel $panel): ?Model
+    {
+        return $this->latestTeam;
+    }
+
+    public function scopeForTenant($query, $tenantId) {
+        return $query->where('team_id', $tenantId);
+    }
+
     public function teams(): BelongsToMany {
         return $this->belongsToMany(Team::class);
     }
@@ -61,7 +70,7 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenant
         'linkedin',
         'website',
         'type',
-        'tenant_id',
+        'team_id',
         'instagram_access_token',
         'instagram_user_id',
     ];
