@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use App\Traits\BlacklistedWordsTrait;
 
 class Song extends Model {
@@ -45,8 +46,8 @@ class Song extends Model {
         'performance_rights_org',
         'license_type',
         'artwork',
-        'ownable_id',
-        'ownable_type',
+        'user_id',
+        'team_id',
         'album_id',
         'tenant_id',
     ];

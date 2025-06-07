@@ -4,6 +4,7 @@ namespace App\Filament\Clusters\Knowledge\Pages;
 
 use App\Filament\Clusters\Knowledge;
 use Filament\Pages\Page;
+use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 
 class FAQ extends Page
 {
@@ -11,7 +12,7 @@ class FAQ extends Page
 
     protected static string $view = 'filament.clusters.knowledge.pages.f-a-q';
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static ?int $navigationSort = 4;
 
     protected static null|string $title = 'FAQ';
 

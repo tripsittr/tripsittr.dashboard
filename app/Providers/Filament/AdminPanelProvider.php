@@ -32,12 +32,22 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Maartenpaauw\Filament\Cashier\Stripe\BillingProvider;
 use Devonab\FilamentEasyFooter\EasyFooterPlugin;
 use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
+use Illuminate\Support\Facades\Request;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 
-class AdminPanelProvider extends PanelProvider {
+class AdminPanelProvider extends PanelProvider
+{
 
-    public function panel(Panel $panel): Panel {
-        $TeamID = null;
+    public function getUserTeamId(): ?string
+    {
+        $tenantId = Request::segment(1);
+
+        return is_numeric($tenantId) ? $tenantId : null;
+    }
+
+    public function panel(Panel $panel): Panel
+    {
 
         return $panel
             ->default()
@@ -68,7 +78,7 @@ class AdminPanelProvider extends PanelProvider {
                     ->withLinks([
                         ['title' => 'Privacy Policy', 'url' => 'https://tripsittr.com/privacy-policy'],
                         ['title' => 'Terms of Service', 'url' => 'https://tripsittr.com/terms-of-service'],
-                        // ['title' => 'Partners', 'url' => ],
+                        ['title' => 'Partners', 'url' => config('app.url') . $this->getUserTeamId() . '/partners'],
                     ])
                     ->withLoadTime('This page loaded in')
                     ->withBorder(true),
@@ -87,11 +97,10 @@ class AdminPanelProvider extends PanelProvider {
                     ->label('Analytics')
                     ->icon('heroicon-s-chart-pie'),
                 NavigationGroup::make()
-                    ->label('Partners') 
-                    ->icon('heroicon-s-globe-alt'),
+                    ->label('Administration'),
                 NavigationGroup::make()
-                    ->label('Administration')
-                    ->icon('heroicon-s-lock-closed')
+                    ->label('Extras')
+                    ->icon('fas-square-plus'),
             ])
             ->brandLogo(asset('/storage/Tripsittr Logo.png'))
             ->brandLogoHeight('2.75rem')
@@ -145,7 +154,6 @@ class AdminPanelProvider extends PanelProvider {
             ->authMiddleware([
                 Authenticate::class,
                 UpdateUserTeam::class,
-            ]); 
-
+            ]);
     }
 }

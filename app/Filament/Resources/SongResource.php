@@ -6,6 +6,10 @@ use App\Filament\Infolists\Components\ArrayEntry;
 use App\Filament\Infolists\Components\AudioEntry;
 use App\Filament\Resources\SongResource\Pages;
 use App\Models\Song;
+use App\Models\Team;
+use App\Models\User;
+use Closure;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Components\{
@@ -18,7 +22,7 @@ use Filament\Forms\Components\{
     Repeater,
     Section
 };
-
+use Filament\Forms\Set;
 use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\{
     Grid,
@@ -44,6 +48,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class SongResource extends Resource {
     protected static ?string $model = Song::class;
@@ -119,6 +124,9 @@ class SongResource extends Resource {
                 TextInput::make('title')
                     ->label('Song Title')
                     ->required()
+                    ->afterStateUpdated(function (Set $set, $state) {
+                        $set('slug', Str::slug($state));
+                    })
                     ->helperText('Enter the official title of the song.'),
 
                 TextInput::make('slug')
@@ -126,12 +134,31 @@ class SongResource extends Resource {
                     ->disabled()
                     ->dehydrated()
                     ->helperText('This is auto-generated from the song title.'),
-
+                Select::make('user_id')
+                    ->label('User ID')
+                    ->visible(fn(): bool => Auth::user()->type == 'Admin' || Filament::getTenant()->type == 'Admin')
+                    ->options(
+                        Auth::user()->type == 'Admin'
+                            ? User::all()->pluck('name', 'id')
+                            : Filament::getTenant()->users->pluck('name', 'id')
+                    )
+                    ->default(Auth::user()->id)
+                    ->required()
+                    ->helperText('The ID of the user who uploaded this song.'),
+                Select::make('team_id')
+                    ->label('Team ID')
+                    ->visible(fn(): bool => Auth::user()->type == 'Admin' || Filament::getTenant()->type == 'Admin')
+                    ->options(Team::all()->pluck('name', 'id'))
+                    ->default(Filament::getTenant()->id)
+                    ->required()
+                    ->helperText('The ID of the team this song belongs to.'),
                 FileUpload::make('song_file')
                     ->label('Upload Song')
-                    ->directory('songs')
-                    ->acceptedFileTypes(['audio/mpeg', 'audio/wav', 'audio/flac'])
+                    ->directory('songs' . Filament::getTenant()->id . '/songs/')
+                    ->acceptedFileTypes(['audio/mpeg', 'audio/x-mpegurl', 'audio/x-scpls', 'audio/ogg', 'audio/wav', 'audio/flac'])
+                    ->downloadable()
                     ->preserveFilenames()
+                    ->openable()
                     ->helperText('Upload an MP3, WAV, or FLAC file.'),
 
                 TextInput::make('isrc')->label('ISRC Code')
@@ -155,29 +182,35 @@ class SongResource extends Resource {
                 FileUpload::make('artwork')
                     ->label('Cover Artwork')
                     ->image()
-                    ->directory('artwork')
+                    ->directory('artwork' . Auth::user()->id . '/photos/')
                     ->helperText('Upload an image (at least 3000x3000px, JPG/PNG) for distribution.'),
             ]),
 
             Section::make('Credits & Contributors')->schema([
                 Repeater::make('primary_artists')->label('Primary Artists')
-                    ->schema([TextInput::make('name')->required()])
+                    ->schema([TextInput::make('name')])
                     ->helperText('List all primary artists involved in this track.'),
 
                 Repeater::make('featured_artists')->label('Featured Artists')
-                    ->schema([TextInput::make('name')->required()])
+                    ->schema([TextInput::make('name')])
                     ->helperText('List all featured artists on this track.'),
 
                 Repeater::make('producers')->label('Producers')
-                    ->schema([TextInput::make('name')->required()])
+                    ->schema([TextInput::make('name')])
                     ->helperText('List all producers involved in creating this track.'),
 
                 Repeater::make('composers')->label('Composers')
-                    ->schema([TextInput::make('name')->required()])
+                    ->schema([TextInput::make('name')])
                     ->helperText('List the original composers of this track.'),
             ]),
 
             Section::make('Release & Distribution')->schema([
+                Select::make('album_id')
+                    ->label('Album ID')
+                    ->relationship('album', 'title')
+                    ->preload()
+                    ->searchable()
+                    ->helperText('Select the album this track belongs to.'),
                 DatePicker::make('release_date')->label('Release Date')
                     ->helperText('Date when the track was or will be officially released.'),
 

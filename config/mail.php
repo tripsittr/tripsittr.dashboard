@@ -14,6 +14,10 @@ return [
     |
     */
 
+    'paths' => [
+        resource_path('views/mail'),
+    ],
+
     'default' => env('MAIL_MAILER', 'log'),
 
     /*

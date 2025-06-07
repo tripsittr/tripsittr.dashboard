@@ -20,7 +20,8 @@ use Spatie\Permission\Traits\HasRoles;
 use App\Traits\BlacklistedWordsTrait;
 use Filament\Facades\Filament;
 
-class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenants {
+class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenants
+{
     use HasFactory, Notifiable;
     use HasRoles;
     use BlacklistedWordsTrait;
@@ -30,27 +31,38 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenant
         return $this->latestTeam;
     }
 
-    public function scopeForTenant($query, $tenantId) {
+    public function scopeForTenant($query, $tenantId)
+    {
         return $query->where('team_id', $tenantId);
     }
 
-    public function teams(): BelongsToMany {
+    public function teams(): BelongsToMany
+    {
         return $this->belongsToMany(Team::class);
     }
 
-    public function getTenants(Panel $panel): Collection {
+    public function userActions(): HasMany
+    {
+        return $this->hasMany(UserAction::class);
+    }
+
+    public function getTenants(Panel $panel): Collection
+    {
         return $this->teams;
     }
 
-    public function canAccessTenant(Model $tenant): bool {
+    public function canAccessTenant(Model $tenant): bool
+    {
         return $this->teams()->whereKey($tenant)->exists();
     }
 
-    public function canAccessPanel(Panel $panel): bool {
+    public function canAccessPanel(Panel $panel): bool
+    {
         return true;
     }
 
-    public function getFilamentAvatarUrl(): ?string {
+    public function getFilamentAvatarUrl(): ?string
+    {
         return $this->avatar_url;
     }
 
@@ -90,14 +102,16 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenant
      *
      * @return array<string, string>
      */
-    protected function casts(): array {
+    protected function casts(): array
+    {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
 
-    public function getBlacklistedFields(): array {
+    public function getBlacklistedFields(): array
+    {
         return array_merge($this->fillable, ['name', 'description']);
     }
 }

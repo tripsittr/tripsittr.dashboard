@@ -14,9 +14,26 @@ class Event extends Model {
         return $this->belongsTo(Team::class);
     }
 
+    // id, name, description, starts_at, ends_at, team_id, created_at, updated_at, venue, priority, notes, status, contact_name, contact_email, contact_phone, contact_website, contact_address, contact_address2, contact_city, contact_state, contact_zip, contact_country, author_id
     protected $fillable = [
         'name',
         'description',
+        'priority',
+        'venue',
+        'type',
+        'status',
+        'contact_name',
+        'contact_email',
+        'contact_phone',
+        'contact_website',
+        'contact_address',
+        'contact_address2',
+        'contact_city',
+        'contact_state',
+        'contact_zip',
+        'contact_country',
+        'author_id',
+        'notes',
         'starts_at',
         'ends_at',
         'team_id',
@@ -25,6 +42,8 @@ class Event extends Model {
     protected $casts = [
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
 

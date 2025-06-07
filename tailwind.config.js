@@ -11,6 +11,7 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
         './resources/views/filament/pages/*.blade.php',
+        './resources/views/filament/clusters/playlists/pages/spotify-playlists.blade.php'
     ],
 
     theme: {

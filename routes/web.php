@@ -1,11 +1,57 @@
 <?php
 
+use App\Filament\Pages\ExtractAudio;
 use App\Filament\User\Pages\UserDashboard;
 use App\Http\Controllers\VenueController;
 use App\Http\Controllers\InstagramController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Laravel\Socialite\Facades\Socialite;
+
+
+Route::post('/extract-audio', [ExtractAudio::class, 'extractAudio'])->name('extract-audio.process');
+
+Route::get('/spotify/login', function () {
+    $query = http_build_query([
+        'client_id' => config('services.spotify.client_id'),
+        'response_type' => 'code',
+        'redirect_uri' => config('services.spotify.redirect'),
+        'scope' => 'playlist-read-private user-read-email', // Add scopes as needed
+    ]);
+
+    return redirect('https://accounts.spotify.com/authorize?' . $query);
+})->name('spotify.login');
+
+Route::get('/spotify/callback', function () {
+    $code = request('code');
+
+    $response = Http::asForm()->post('https://accounts.spotify.com/api/token', [
+        'grant_type' => 'authorization_code',
+        'code' => $code,
+        'redirect_uri' => config('services.spotify.redirect'),
+        'client_id' => config('services.spotify.client_id'),
+        'client_secret' => config('services.spotify.client_secret'),
+    ]);
+
+    $data = $response->json();
+
+    // Log the full response for debugging
+    logger('Spotify API Response:', $data);
+
+    if (!isset($data['refresh_token'])) {
+        return response()->json([
+            'error' => 'Refresh token not returned. Check your Spotify app settings and scopes.',
+            'response' => $data,
+        ]);
+    }
+
+    // Save the refresh token to a file
+    file_put_contents(storage_path('spotify_refresh_token.txt'), $data['refresh_token']);
+
+    return 'Refresh token saved successfully!';
+})->name('spotify.callback');
 
 Route::delete('/venue/{id}', [VenueController::class, 'destroy'])->name('venue.destroy');
 Route::post('/venues/{venue}/share', [VenueController::class, 'share'])->name('venue.share');
@@ -20,7 +66,7 @@ Route::get(
         $user = Socialite::driver('facebook')->user();
 
         // Save the tokens to the database
-        auth()->user()->integrations()->updateOrCreate(
+        Auth::user()->integrations()->updateOrCreate(
             ['service' => 'facebook'],
             [
                 'access_token' => $user->token,
