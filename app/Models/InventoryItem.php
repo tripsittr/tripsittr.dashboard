@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Traits\BlacklistedWordsTrait;
 
-class InventoryItem extends Model {
+class InventoryItem extends Model
+{
     use HasFactory;
     use BlacklistedWordsTrait;
 
@@ -56,37 +57,45 @@ class InventoryItem extends Model {
         'low_stock_threshold' => 'integer',
     ];
 
-    protected static function boot() {
+    protected static function boot()
+    {
         parent::boot();
     }
 
-    public function team(): BelongsTo {
+    public function team(): BelongsTo
+    {
         return $this->belongsTo(Team::class);
     }
 
-    public function getOwnerAttribute(): string {
+    public function getOwnerAttribute(): string
+    {
         return '(Band) ' . $this->band?->name ?? '(User) ' . $this->user?->name ?? 'N/A';
     }
 
     // Accessors for formatted attributes
-    public function getFormattedPriceAttribute() {
+    public function getFormattedPriceAttribute()
+    {
         return $this->price ? '$' . number_format($this->price, 2) : 'N/A';
     }
 
-    public function getFormattedWeightAttribute() {
+    public function getFormattedWeightAttribute()
+    {
         return $this->weight ? "{$this->weight} {$this->weight_unit}" : 'N/A';
     }
 
-    public function getFormattedDimensionsAttribute() {
+    public function getFormattedDimensionsAttribute()
+    {
         if (!$this->length || !$this->width || !$this->height) return 'N/A';
         return "{$this->length} × {$this->width} × {$this->height} {$this->dims_unit}";
     }
 
-    public function scopeForTenant($query, $tenantId) {
+    public function scopeForTenant($query, $tenantId)
+    {
         return $query->where('tenant_id', $tenantId);
     }
 
-    public function getBlacklistedFields(): array {
+    public function getBlacklistedFields(): array
+    {
         return array_merge($this->fillable, ['name', 'description']);
     }
 }

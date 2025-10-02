@@ -7,17 +7,23 @@ use App\Filament\Resources\SongResource\Widgets\SongsTableWidget;
 use Filament\Resources\Pages\ViewRecord;
 use Awcodes\Recently\Concerns\HasRecentHistoryRecorder;
 
-class ViewAlbum extends ViewRecord {
+class ViewAlbum extends ViewRecord
+{
     protected static string $resource = AlbumResource::class;
 
     use HasRecentHistoryRecorder;
 
-    public function getFooterWidgetsColumns(): int | array {
+    public function getFooterWidgetsColumns(): int | array
+    {
         return 1;
     }
 
-    protected function getFooterWidgets(): array {
+    protected function getFooterWidgets(): array
+    {
         return [
+            \App\Filament\Widgets\AlbumSongsTileWidget::make([
+                'album' => $this->record,
+            ]),
             SongsTableWidget::make([
                 'albumId' => $this->record->id,
             ]),

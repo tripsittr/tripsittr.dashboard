@@ -26,6 +26,7 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenant
     use HasRoles;
     use BlacklistedWordsTrait;
 
+
     public function getDefaultTenant(Panel $panel): ?Model
     {
         return $this->latestTeam;

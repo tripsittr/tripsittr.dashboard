@@ -10,11 +10,11 @@ use Filament\Facades\Filament;
 
 class GeneralCount extends BaseWidget
 {
-    protected int | string | array $columnSpan = '2';
+    protected int | string | array $columnSpan = '1';
 
     public function getColumns(): int
     {
-        return 2;
+        return 1;
     }
 
     protected function getStats(): array
@@ -24,7 +24,6 @@ class GeneralCount extends BaseWidget
 
         return [
             Stat::make('Events', Event::where('team_id', $activeTeamId)->count()),
-            Stat::make('Inventory', InventoryItem::where('team_id', $activeTeamId)->count()),
         ];
     }
 }

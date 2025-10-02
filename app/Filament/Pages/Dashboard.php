@@ -10,21 +10,23 @@ use App\Filament\Widgets\Dashboard\MusicCount;
 use App\Filament\Widgets\SpacerWidget;
 use Filament\Widgets\AccountWidget;
 
-class Dashboard extends PagesDashboard {
+class Dashboard extends PagesDashboard
+{
     protected static ?string $navigationIcon = 'heroicon-s-home';
 
-    public function getHeaderWidgetsColumns(): int | array {
-        return 4;
+    public function getHeaderWidgetsColumns(): int | array
+    {
+        return 3;
     }
 
     protected static string $view = 'filament.pages.dashboard';
 
-    protected function getHeaderWidgets(): array {
+    protected function getHeaderWidgets(): array
+    {
         return [
-            AccountWidget::class,
-            SpacerWidget::class,
-            SpacerWidget::class,
             DashboardMusicForArtists::class,
+            SpacerWidget::class,
+            AccountWidget::class,
             MusicCount::class,
             GeneralCount::class,
             DashboardCalendar::class,

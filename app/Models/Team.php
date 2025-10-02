@@ -16,6 +16,7 @@ class Team extends Model
 
     protected $fillable = ['name', 'type', 'members', 'team_avatar', 'formation_date', 'genre', 'website', 'instagram', 'twitter', 'facebook', 'youtube', 'email', 'phone'];
 
+    // mediaUploads relation removed along with custom media system
 
     public function songs(): HasMany
     {

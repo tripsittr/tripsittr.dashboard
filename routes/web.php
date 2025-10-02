@@ -1,17 +1,18 @@
 <?php
 
 use App\Filament\Pages\ExtractAudio;
-use App\Filament\User\Pages\UserDashboard;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\VenueController;
-use App\Http\Controllers\InstagramController;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
-
 Route::post('/extract-audio', [ExtractAudio::class, 'extractAudio'])->name('extract-audio.process');
+
+// Public documentation landing page
+Route::view('/docs', 'docs')->name('docs');
 
 Route::get('/spotify/login', function () {
     $query = http_build_query([
@@ -21,7 +22,7 @@ Route::get('/spotify/login', function () {
         'scope' => 'playlist-read-private user-read-email', // Add scopes as needed
     ]);
 
-    return redirect('https://accounts.spotify.com/authorize?' . $query);
+    return redirect('https://accounts.spotify.com/authorize?'.$query);
 })->name('spotify.login');
 
 Route::get('/spotify/callback', function () {
@@ -40,7 +41,7 @@ Route::get('/spotify/callback', function () {
     // Log the full response for debugging
     logger('Spotify API Response:', $data);
 
-    if (!isset($data['refresh_token'])) {
+    if (! isset($data['refresh_token'])) {
         return response()->json([
             'error' => 'Refresh token not returned. Check your Spotify app settings and scopes.',
             'response' => $data,
@@ -89,3 +90,13 @@ Route::get('/subscribe', function (Request $request) {
             'cancel_url' => route('users.dashboard'),
         ]);
 });
+
+// Auth endpoints required by Feature tests
+Route::post('login', [AuthenticatedSessionController::class, 'store'])->middleware('guest');
+Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth')->name('logout');
+
+// Provide a generic dashboard route used by tests, redirecting to Filament dashboard
+Route::get('/dashboard', function () {
+    // If using tenant-aware Filament, redirect to root which will route to default tenant dashboard
+    return redirect()->intended('/');
+})->name('dashboard');

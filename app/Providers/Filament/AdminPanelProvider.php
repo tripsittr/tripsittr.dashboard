@@ -4,22 +4,22 @@ namespace App\Providers\Filament;
 
 use App\Filament\Clusters\Admin;
 use App\Filament\Clusters\Admin\Resources\UserResource;
-use App\Filament\Clusters\Knowledge\Resources\KnowledgeResource;
+use App\Filament\Pages\Auth\Register;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ListTeamMembers;
-use App\Filament\Pages\Partners;
 use App\Filament\Pages\Tenancy\EditTeamProfile;
 use App\Filament\Pages\Tenancy\RegisterTeam;
 use App\Filament\Widgets\DashboardMusicForArtists;
 use App\Http\Middleware\UpdateUserTeam;
 use App\Models\Team;
 use Awcodes\Overlook\OverlookPlugin;
-use Filament\Facades\Filament;
+use Devonab\FilamentEasyFooter\EasyFooterPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -28,17 +28,13 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Maartenpaauw\Filament\Cashier\Stripe\BillingProvider;
-use Devonab\FilamentEasyFooter\EasyFooterPlugin;
-use Filament\Navigation\NavigationGroup;
-use Filament\Navigation\NavigationItem;
-use Illuminate\Support\Facades\Request;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
-
     public function getUserTeamId(): ?string
     {
         $tenantId = Request::segment(1);
@@ -53,14 +49,14 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('')
-            ->topNavigation(true)
+            ->topNavigation(false)
             ->databaseNotifications()
             ->tenantBillingProvider(new BillingProvider('solo_artist'))
             ->tenantProfile(EditTeamProfile::class)
             ->tenantRegistration(RegisterTeam::class)
             ->unsavedChangesAlerts()
             ->tenant(Team::class)
-            // ->registration()
+            ->registration(Register::class)
             ->plugins([
                 OverlookPlugin::make()
                     ->sort(2)
@@ -78,10 +74,11 @@ class AdminPanelProvider extends PanelProvider
                     ->withLinks([
                         ['title' => 'Privacy Policy', 'url' => 'https://tripsittr.com/privacy-policy'],
                         ['title' => 'Terms of Service', 'url' => 'https://tripsittr.com/terms-of-service'],
-                        ['title' => 'Partners', 'url' => config('app.url') . $this->getUserTeamId() . '/partners'],
+                        ['title' => 'Partners', 'url' => config('app.url').$this->getUserTeamId().'/partners'],
                     ])
                     ->withLoadTime('This page loaded in')
                     ->withBorder(true),
+
             ])
             ->navigationGroups([
                 NavigationGroup::make()
@@ -101,6 +98,9 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Extras')
                     ->icon('fas-square-plus'),
+                NavigationGroup::make()
+                    ->label('Content'),
+                // ->icon('fas-square-plus'),
             ])
             ->brandLogo(asset('/storage/Tripsittr Logo.png'))
             ->brandLogoHeight('2.75rem')
@@ -108,19 +108,19 @@ class AdminPanelProvider extends PanelProvider
             ->userMenuItems([
                 MenuItem::make()
                     ->label('Knowledge')
-                    ->url(fn(): string => KnowledgeResource::getUrl())
+                    ->url(fn (): string => '/'.$this->getUserTeamId().'/knowledge/knowledge')
                     ->icon('fas-book'),
                 MenuItem::make()
                     ->label('Admin')
-                    ->url(fn(): string => Admin::getUrl())
-                    ->visible(fn(): bool => Auth::user()->type == 'Admin')
+                    ->url(fn (): string => Admin::getUrl())
+                    ->visible(fn (): bool => Auth::user()->type == 'Admin')
                     ->icon('fas-lock'),
             ])
             ->tenantMenuItems([
                 'register' => MenuItem::make()->label('Register New Team')
-                    ->visible(fn(): bool => Auth::user()->type == 'Admin'),
+                    ->visible(fn (): bool => Auth::user()->type == 'Admin'),
                 'profile' => MenuItem::make()->label('Edit Team Profile'),
-                'members' => MenuItem::make()->label('Manage Members')->url(fn(): string => ListTeamMembers::getUrl()),
+                'members' => MenuItem::make()->label('Manage Members')->url(fn (): string => ListTeamMembers::getUrl()),
             ])
             ->login()
             ->colors([

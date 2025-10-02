@@ -15,17 +15,17 @@ class ModelCreated extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $model; // Add a public property to hold the model data
+    public $model;
 
     public function __construct($model)
     {
-        $this->model = $model; // Pass the model to the mailable
+        $this->model = $model;
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: 'support@tripsittr.com', // Use the default "From" address
+            from: 'support@tripsittr.com',
             subject: 'Album Has Been Created',
         );
     }
@@ -37,8 +37,8 @@ class ModelCreated extends Mailable
             view: 'emails.events.albums.album_created',
             with: [
                 'model' => $this->model,
-                'user' => Auth::user(), 
-                'tenant' => Filament::getTenant(), 
+                'user' => Auth::user(),
+                'tenant' => Filament::getTenant(),
             ],
         );
     }
