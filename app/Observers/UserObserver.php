@@ -2,14 +2,14 @@
 
 namespace App\Observers;
 
-use App\Mail\ModelCreated;
-use App\Mail\ModelDeleted;
-use App\Mail\ModelUpdated;
+use App\Mail\Events\Users\ModelCreated;
+use App\Mail\Events\Users\ModelDeleted;
+use App\Mail\Events\Users\ModelUpdated;
 use App\Models\User;
+use App\Services\SafeMailer;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class UserObserver
 {
@@ -19,11 +19,14 @@ class UserObserver
             $query->where('type', 'Admin');
         })->orWhere('type', 'Admin')->get();
 
+        $actionType = 'create_user';
+        $authUserId = Auth::id();
+        $tenantId = optional(Filament::getTenant())->id;
         foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new ModelCreated($user));
+            SafeMailer::send($admin->email, new ModelCreated($user, $actionType, $authUserId, $tenantId), 'user.created');
         }
 
-        Log::info('Model created email sent to admins.');
+        Log::info('User created email sent to admins.');
     }
 
     public function updated(User $user): void
@@ -32,13 +35,14 @@ class UserObserver
             $query->where('type', 'Admin');
         })->orWhere('type', 'Admin')->get();
 
-        if (!empty(Filament::getTenant()->id)) {
+        $tenant = Filament::getTenant();
+        if (! empty($tenant?->id)) {
             foreach ($admins as $admin) {
-                Mail::to($admin->email)->send(new ModelUpdated($user));
+                SafeMailer::send($admin->email, new ModelUpdated($user), 'user.updated');
             }
-        };
+        }
 
-        Log::info('Model created email sent to admins.');
+        Log::info('User updated email sent to admins.');
     }
 
     public function deleted(User $user): void
@@ -48,10 +52,10 @@ class UserObserver
         })->orWhere('type', 'Admin')->get();
 
         foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new ModelDeleted($user));
+            SafeMailer::send($admin->email, new ModelDeleted($user), 'user.deleted');
         }
 
-        Log::info('Model created email sent to admins.');
+        Log::info('User deleted email sent to admins.');
     }
 
     public function restored(User $user): void

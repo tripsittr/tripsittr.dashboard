@@ -1,0 +1,1 @@
+{{-- This view is now handled by Filament infolist. See TracksResource::infolist and ViewTrack page class. --}}

@@ -101,4 +101,17 @@ return [
 
     'livewire_loading_delay' => 'default',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Temporary File Upload (Livewire)
+    |--------------------------------------------------------------------------
+    | Override the default temporary upload validation rules for Filament / Livewire.
+    | The 'max' value is in kilobytes. 122880 KB = 120 MB.
+    | Adjust if you plan to allow larger audio uploads.
+    */
+    'temporary_file_upload' => [
+        'rules' => ['required', 'file', 'max:122880'], // 120 MB
+        // You can optionally add: 'directory' => 'tmp', 'disk' => 'local'
+    ],
+
 ];

@@ -10,12 +10,21 @@ class RolePolicy
 {
     use HandlesAuthorization;
 
+    // Allow Admins (by user type or role) to bypass granular checks
+    public function before(User $user, string $ability): ?bool
+    {
+        if ($user->type === 'Admin' || $user->hasRole('Admin')) {
+            return true;
+        }
+        return null;
+    }
+
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_role');
+        return $user->can('view roles') || $user->can('manage roles');
     }
 
     /**
@@ -23,7 +32,7 @@ class RolePolicy
      */
     public function view(User $user, Role $role): bool
     {
-        return $user->can('view_role');
+        return $user->can('view roles') || $user->can('manage roles');
     }
 
     /**
@@ -31,7 +40,7 @@ class RolePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_role');
+        return $user->can('manage roles');
     }
 
     /**
@@ -39,7 +48,7 @@ class RolePolicy
      */
     public function update(User $user, Role $role): bool
     {
-        return $user->can('update_role');
+        return $user->can('manage roles');
     }
 
     /**
@@ -47,7 +56,7 @@ class RolePolicy
      */
     public function delete(User $user, Role $role): bool
     {
-        return $user->can('delete_role');
+        return $user->can('manage roles');
     }
 
     /**
@@ -55,7 +64,7 @@ class RolePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_role');
+        return $user->can('manage roles');
     }
 
     /**

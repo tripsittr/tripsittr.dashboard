@@ -15,8 +15,11 @@ class UserAction extends Mailable
     use Queueable, SerializesModels;
 
     public $model;
+
     public $action;
+
     public $userId;
+
     public $teamId;
 
     public function __construct($model, $action, $userId, $teamId)

@@ -10,6 +10,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -19,12 +20,14 @@ use Illuminate\Support\Collection;
 use Spatie\Permission\Traits\HasRoles;
 use App\Traits\BlacklistedWordsTrait;
 use Filament\Facades\Filament;
+use Laravel\Cashier\Billable;
 
 class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenants
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
     use HasRoles;
     use BlacklistedWordsTrait;
+    use Billable; // Enable Cashier subscription & billing methods
 
 
     public function getDefaultTenant(Panel $panel): ?Model
@@ -54,7 +57,16 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenant
 
     public function canAccessTenant(Model $tenant): bool
     {
+        // Allow global access for platform admins
+        if ($this->type === 'Admin' || $this->hasRole('Admin')) {
+            return true;
+        }
         return $this->teams()->whereKey($tenant)->exists();
+    }
+
+    public function isTeamAdmin(Team $team): bool
+    {
+        return $this->hasRole('Admin') && $this->teams()->where('teams.id',$team->id)->exists();
     }
 
     public function canAccessPanel(Panel $panel): bool
@@ -114,5 +126,34 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenant
     public function getBlacklistedFields(): array
     {
         return array_merge($this->fillable, ['name', 'description']);
+    }
+
+    /**
+     * Resolve the user's current team (active tenant) for convenience.
+     * Falls back to first associated team.
+     */
+    public function getCurrentTeamAttribute(): ?Team
+    {
+        // If Filament has a current tenant selected, prefer that.
+        try {
+            $tenant = \Filament\Facades\Filament::getTenant();
+            if ($tenant instanceof Team && $this->teams->contains('id', $tenant->id)) {
+                return $tenant;
+            }
+        } catch (\Throwable $e) {
+            // ignore if Filament not resolved yet
+        }
+        // Eager loaded relationship check
+        if ($this->relationLoaded('teams') && $this->teams->isNotEmpty()) {
+            return $this->teams->first();
+        }
+        // Query for first team membership
+        return $this->teams()->first();
+    }
+
+    // Backwards compatibility helper (method style)
+    public function currentTeam(): ?Team
+    {
+        return $this->current_team; // will invoke accessor
     }
 }

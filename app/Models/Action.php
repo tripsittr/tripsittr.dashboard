@@ -6,16 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Action extends Model
 {
-    protected $fillable = [
-        'action_title',
-        'action_type',
-    ];
+    protected $fillable = [ 'action_title', 'action_type' ];
 
-    protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    protected $table = 'action';
-    protected $primaryKey = 'id';
+    protected $casts = [ 'created_at' => 'datetime', 'updated_at' => 'datetime' ];
+    // Table now plural (normalization migration handles rename if legacy existed)
+    protected $table = 'actions';
 }

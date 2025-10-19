@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\AlbumResource\Pages;
 
 use App\Filament\Resources\AlbumResource;
-use App\Filament\Resources\SongResource\Widgets\SongsTableWidget;
+use App\Filament\Clusters\Music\Resources\TracksResource\Widgets\TracksTableWidget;
 use Filament\Resources\Pages\ViewRecord;
 use Awcodes\Recently\Concerns\HasRecentHistoryRecorder;
 
@@ -24,7 +24,7 @@ class ViewAlbum extends ViewRecord
             \App\Filament\Widgets\AlbumSongsTileWidget::make([
                 'album' => $this->record,
             ]),
-            SongsTableWidget::make([
+            TracksTableWidget::make([
                 'albumId' => $this->record->id,
             ]),
         ];

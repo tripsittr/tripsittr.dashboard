@@ -5,93 +5,60 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Models\Team;
 
-class RolesAndPermissionsSeeder extends Seeder {
-    public function run() {
-        // General Permissions
-        $permissions = [
-            'view dashboard',
-            'manage users',
-            'manage roles',
-            'manage permissions',
-            'manage teams',
-            'view teams',
-            'edit teams',
-            'delete teams',
-            'manage merchandise',
-            'manage orders',
-            'manage analytics',
+class RolesAndPermissionsSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $entities = [
+            'catalog items','customers','orders','inventory items','activity logs'
         ];
-
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+        $actions = ['view','view_any','create','update','delete'];
+        foreach($entities as $entity){
+            foreach($actions as $action){
+                Permission::firstOrCreate(['name' => $action.' '. $entity]);
+            }
         }
 
-        // Team-Specific Permissions
-        foreach (range(1, 10) as $teamId) { // Adjust range for team count
-            Permission::firstOrCreate(['name' => "manage team-$teamId"]);
-            Permission::firstOrCreate(['name' => "invite members-team-$teamId"]);
-            Permission::firstOrCreate(['name' => "edit team settings-team-$teamId"]);
+        $teams = Team::all();
+        if ($teams->isEmpty()) {
+            $this->command?->warn('No teams found: skipping team-scoped role creation.');
         }
+        foreach ($teams as $team) {
+            app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId($team->id);
 
-        // Band-Specific Permissions
-        foreach (range(1, 10) as $bandId) { // Adjust range for bands
-            Permission::firstOrCreate(['name' => "manage band-$bandId"]);
-            Permission::firstOrCreate(['name' => "invite members-band-$bandId"]);
-            Permission::firstOrCreate(['name' => "edit band settings-band-$bandId"]);
-            Permission::firstOrCreate(['name' => "add songs-band-$bandId"]);
-            Permission::firstOrCreate(['name' => "add albums-band-$bandId"]);
-            Permission::firstOrCreate(['name' => "manage merch-band-$bandId"]);
-            Permission::firstOrCreate(['name' => "view band-$bandId"]);
+            $admin = Role::firstOrCreate([
+                'name' => 'Admin',
+                'team_id' => $team->id,
+                'guard_name' => 'web',
+            ]);
+            $manager = Role::firstOrCreate([
+                'name' => 'Manager',
+                'team_id' => $team->id,
+                'guard_name' => 'web',
+            ]);
+            $member = Role::firstOrCreate([
+                'name' => 'Member',
+                'team_id' => $team->id,
+                'guard_name' => 'web',
+            ]);
+
+            $admin->syncPermissions(Permission::all());
+            $manager->syncPermissions(Permission::whereIn('name', [
+                'view catalog items','view_any catalog items','create catalog items','update catalog items',
+                'view customers','view_any customers','create customers','update customers',
+                'view orders','view_any orders','create orders','update orders',
+                'view inventory items','view_any inventory items','create inventory items','update inventory items',
+                'view activity logs','view_any activity logs'
+            ])->get());
+
+            $member->syncPermissions(Permission::whereIn('name', [
+                'view catalog items','view_any catalog items',
+                'view customers','view_any customers',
+                'view orders','view_any orders',
+                'view inventory items','view_any inventory items'
+            ])->get());
         }
-
-        // Roles & Assign Permissions
-        $adminRole = Role::firstOrCreate(['name' => 'Admin']);
-        $managerRole = Role::firstOrCreate(['name' => 'Manager']);
-        $userRole = Role::firstOrCreate(['name' => 'User']);
-
-        $teamOwnerRole = Role::firstOrCreate(['name' => 'Team Owner']);
-        $teamManagerRole = Role::firstOrCreate(['name' => 'Team Manager']);
-        $teamMemberRole = Role::firstOrCreate(['name' => 'Team Member']);
-
-        $bandOwnerRole = Role::firstOrCreate(['name' => 'Band Owner']);
-        $bandManagerRole = Role::firstOrCreate(['name' => 'Band Manager']);
-        $bandMemberRole = Role::firstOrCreate(['name' => 'Band Member']);
-
-        // Assign General Permissions
-        $adminRole->syncPermissions($permissions);
-        $managerRole->syncPermissions(['view dashboard', 'manage users', 'manage teams']);
-        $userRole->syncPermissions(['view dashboard', 'view teams']);
-
-        // Assign Team-Specific Permissions
-        $teamOwnerRole->syncPermissions([
-            "manage team-1",
-            "invite members-team-1",
-            "edit team settings-team-1",
-        ]);
-        $teamManagerRole->syncPermissions([
-            "manage team-1",
-            "invite members-team-1",
-        ]);
-        $teamMemberRole->syncPermissions(["view teams"]);
-
-        // Assign Band-Specific Permissions
-        $bandOwnerRole->syncPermissions([
-            "manage band-1",
-            "invite members-band-1",
-            "edit band settings-band-1",
-            "add songs-band-1",
-            "add albums-band-1",
-            "manage merch-band-1",
-            "view band-1",
-        ]);
-        $bandManagerRole->syncPermissions([
-            "edit band settings-band-1",
-            "add songs-band-1",
-            "add albums-band-1",
-            "manage merch-band-1",
-            "view band-1",
-        ]);
-        $bandMemberRole->syncPermissions(["view band-1"]);
     }
 }

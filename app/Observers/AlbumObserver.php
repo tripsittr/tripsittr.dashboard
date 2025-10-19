@@ -2,17 +2,15 @@
 
 namespace App\Observers;
 
-use App\Mail\Events\Albums\ModelCreated;
-use App\Mail\Events\Albums\ModelDeleted;
-use App\Mail\Events\Albums\ModelUpdated;
-use App\Mail\Events\UserAction;
+use App\Notifications\AlbumActivityNotification;
+use App\Services\LogActivity;
 use App\Models\Action;
 use App\Models\Album;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
+use App\Services\SafeMailer;
 
 class AlbumObserver
 {
@@ -24,9 +22,12 @@ class AlbumObserver
             $query->where('type', 'Admin');
         })->orWhere('type', 'Admin')->get();
 
+        $action = Action::where('action_type', $action_type)->first();
+        $actionLabel = $action?->action_title ?? $action_type;
         foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new UserAction($model, Action::All()->where('action_type', $action_type), Auth::user()->id, Filament::getTenant()->id));
+            $admin->notify(new AlbumActivityNotification($model, 'created'));
         }
+        LogActivity::record('album.created','Album',$model->id,[],Filament::getTenant()?->id);
     }
 
     public function updated(Album $model): void
@@ -37,9 +38,12 @@ class AlbumObserver
             $query->where('type', 'Admin');
         })->orWhere('type', 'Admin')->get();
 
+        $action = Action::where('action_type', $action_type)->first();
+        $actionLabel = $action?->action_title ?? $action_type;
         foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new UserAction($model, Action::All()->where('action_type', $action_type), Auth::user()->id, Filament::getTenant()->id));
+            $admin->notify(new AlbumActivityNotification($model, 'updated'));
         }
+        LogActivity::record('album.updated','Album',$model->id,$model->getChanges(),Filament::getTenant()?->id);
     }
 
     public function deleted(Album $model): void
@@ -50,9 +54,12 @@ class AlbumObserver
             $query->where('type', 'Admin');
         })->orWhere('type', 'Admin')->get();
 
+        $action = Action::where('action_type', $action_type)->first();
+        $actionLabel = $action?->action_title ?? $action_type;
         foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new UserAction($model, Action::All()->where('action_type', $action_type), Auth::user()->id, Filament::getTenant()->id));
+            $admin->notify(new AlbumActivityNotification($model, 'deleted'));
         }
+        LogActivity::record('album.deleted','Album',$model->id,[],Filament::getTenant()?->id);
 
         Log::info('Model created email sent to admins.');
     }

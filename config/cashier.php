@@ -101,25 +101,52 @@ return [
     */
 
     'plans' => [
+        // NOTE: Filament Cashier BillingProvider is instantiated with slug 'solo_artist' in AdminPanelProvider.
+        // The project already defines STRIPE_PRICE_SOLO / STRIPE_PRICE_BAND / STRIPE_PRICE_ENTERPRISE in .env(.example)
+        // but the previous config expected *_PRICE_ID variables that did not exist, causing null price_id and a TypeError.
+        // We map and add layered fallbacks so a missing env never results in null.
         'solo_artist' => [
-            'product_id' => ENV('CASHIER_STRIPE_SUBSCRIPTION_PRODUCT_ID'),
-            'price_id' => ENV('SOLO_ARTIST_PRICE_ID'),
+            'product_id' => env('CASHIER_STRIPE_SUBSCRIPTION_PRODUCT_ID'),
+            'price_id' => env('SOLO_ARTIST_PRICE_ID',
+                env('STRIPE_PRICE_SOLO',
+                    // Final fallback to plans config if present
+                    (function(){
+                        $p = config('plans.plans.solo.stripe_price_id') ?? null;
+                        return $p ?: 'missing_solo_price_id';
+                    })()
+                )
+            ),
             'trial_days' => 30,
             'type' => 'default',
             'allow_promotion_codes' => true,
             'collect_tax_ids' => true,
         ],
         'band' => [
-            'product_id' => ENV('CASHIER_STRIPE_SUBSCRIPTION_PRODUCT_ID'),
-            'price_id' => ENV('BAND_PRICE_ID'),
+            'product_id' => env('CASHIER_STRIPE_SUBSCRIPTION_PRODUCT_ID'),
+            'price_id' => env('BAND_PRICE_ID',
+                env('STRIPE_PRICE_BAND',
+                    (function(){
+                        $p = config('plans.plans.band.stripe_price_id') ?? null;
+                        return $p ?: 'missing_band_price_id';
+                    })()
+                )
+            ),
             'trial_days' => 30,
             'type' => 'default',
             'allow_promotion_codes' => true,
             'collect_tax_ids' => true,
         ],
+        // Mapping organization -> enterprise env variable naming used elsewhere
         'organization' => [
-            'product_id' => ENV('CASHIER_STRIPE_SUBSCRIPTION_PRODUCT_ID'),
-            'price_id' => ENV('ORGANIZATION_PRICE_ID'),
+            'product_id' => env('CASHIER_STRIPE_SUBSCRIPTION_PRODUCT_ID'),
+            'price_id' => env('ORGANIZATION_PRICE_ID',
+                env('STRIPE_PRICE_ENTERPRISE',
+                    (function(){
+                        $p = config('plans.plans.enterprise.stripe_price_id') ?? null;
+                        return $p ?: 'missing_enterprise_price_id';
+                    })()
+                )
+            ),
             'trial_days' => 30,
             'type' => 'default',
             'allow_promotion_codes' => true,

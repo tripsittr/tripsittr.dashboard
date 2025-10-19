@@ -8,7 +8,7 @@ use App\Mail\Events\Events\ModelUpdated;
 use App\Models\Event;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
+use App\Services\SafeMailer;
 
 class EventObserver
 {
@@ -19,7 +19,7 @@ class EventObserver
         })->orWhere('type', 'Admin')->get();
 
         foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new ModelCreated($event));
+            SafeMailer::send($admin->email, new ModelCreated($event), 'event.created');
         }
 
         Log::info('Model created email sent to admins.');
@@ -32,7 +32,7 @@ class EventObserver
         })->orWhere('type', 'Admin')->get();
 
         foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new ModelUpdated($event));
+            SafeMailer::send($admin->email, new ModelUpdated($event), 'event.updated');
         }
 
         Log::info('Model created email sent to admins.');
@@ -45,7 +45,7 @@ class EventObserver
         })->orWhere('type', 'Admin')->get();
 
         foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new ModelDeleted($event));
+            SafeMailer::send($admin->email, new ModelDeleted($event), 'event.deleted');
         }
 
         Log::info('Model created email sent to admins.');

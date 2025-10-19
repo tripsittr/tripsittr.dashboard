@@ -8,7 +8,7 @@ use App\Mail\Events\Songs\ModelUpdated;
 use App\Models\Song;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
+use App\Services\SafeMailer;
 
 class SongObserver
 {
@@ -19,7 +19,7 @@ class SongObserver
         })->orWhere('type', 'Admin')->get();
 
         foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new ModelCreated($song));
+            SafeMailer::send($admin->email, new ModelCreated($song), 'song.created');
         }
 
         Log::info('Model created email sent to admins.');
@@ -32,7 +32,7 @@ class SongObserver
         })->orWhere('type', 'Admin')->get();
 
         foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new ModelUpdated($song));
+            SafeMailer::send($admin->email, new ModelUpdated($song), 'song.updated');
         }
 
         Log::info('Model created email sent to admins.');
@@ -45,7 +45,7 @@ class SongObserver
         })->orWhere('type', 'Admin')->get();
 
         foreach ($admins as $admin) {
-            Mail::to($admin->email)->send(new ModelDeleted($song));
+            SafeMailer::send($admin->email, new ModelDeleted($song), 'song.deleted');
         }
 
         Log::info('Model created email sent to admins.');

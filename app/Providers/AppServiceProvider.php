@@ -2,42 +2,77 @@
 
 namespace App\Providers;
 
+use App\Models\Address;
 use App\Models\Album;
+use App\Models\CatalogItem;
+use App\Models\Customer;
 use App\Models\Event;
+use App\Models\InventoryItem;
+use App\Models\Invitation;
+use App\Models\Knowledge;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Song;
 use App\Models\Team;
+use App\Models\TeamUser;
 use App\Models\User;
+use App\Models\Venue;
+use App\Observers\BaseModelObserver;
 use App\Observers\UserObserver;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Contracts\Auth\Access\Gate as GateContract;
-use Illuminate\Support\Facades\Auth;
+use App\Policies\AlbumPolicy;
+use App\Policies\RolePolicy;
+use App\Policies\SongPolicy;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Cashier;
+use Spatie\Permission\Models\Role as SpatieRole;
 
-class AppServiceProvider extends ServiceProvider {
+class AppServiceProvider extends ServiceProvider
+{
     /**
      * Register any application services.
      */
-    public function register(): void {
+    public function register(): void
+    {
         //
     }
 
     /**
      * Bootstrap any application services.
      */
-
-    public function boot(): void {
+    public function boot(): void
+    {
         Blade::component('share-venue-modal', \App\View\Components\ShareVenueModal::class);
         Cashier::useCustomerModel(Team::class);
         Cashier::calculateTaxes();
 
-
-        // Observers
+        // Observers (specific)
         User::observe(UserObserver::class);
         Song::observe(\App\Observers\SongObserver::class);
         Album::observe(\App\Observers\AlbumObserver::class);
+
+        // Policies
+        Gate::policy(Album::class, AlbumPolicy::class);
+        Gate::policy(Song::class, SongPolicy::class);
+        Gate::policy(SpatieRole::class, RolePolicy::class);
         Event::observe(\App\Observers\EventObserver::class);
+
+        // Generic observer for remaining models (skip those with custom logic or potential recursion issues)
+        foreach ([
+            Address::class,
+            CatalogItem::class,
+            Customer::class,
+            InventoryItem::class,
+            Invitation::class,
+            Knowledge::class,
+            Order::class,
+            OrderItem::class,
+            TeamUser::class,
+            Venue::class,
+        ] as $modelClass) {
+            $modelClass::observe(BaseModelObserver::class);
+        }
 
     }
 }

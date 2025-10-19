@@ -1,0 +1,4 @@
+{
+    "Invitation Email Mismatch": "You are logged in as :current but this invitation was sent to :expected. Please log out and log back in with the invited email, or ask the inviter to resend the invitation to your current email.",
+    "Logout": "Logout"
+}

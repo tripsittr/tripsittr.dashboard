@@ -9,13 +9,48 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Pages\Tenancy\EditTenantProfile;
+use Illuminate\Support\Facades\Auth;
 
-class EditTeamProfile extends EditTenantProfile {
-    public static function getLabel(): string {
+class EditTeamProfile extends EditTenantProfile
+{
+    public static function getLabel(): string
+    {
         return 'Team profile';
     }
 
-    public function form(Form $form): Form {
+    public function getTeam(): ?\App\Models\Team
+    {
+        // Get the current tenant (team) from Filament context
+        $tenant = \Filament\Facades\Filament::getTenant();
+        if ($tenant instanceof \App\Models\Team) {
+            return $tenant;
+        }
+        return Auth::user()?->current_team;
+    }
+
+    public function getMembers()
+    {
+        $team = $this->getTeam();
+        return $team ? $team->users()->with('roles')->orderBy('users.name')->get() : collect();
+    }
+
+    public function getInvitations()
+    {
+        $team = $this->getTeam();
+        return $team ? $team->invitations()->latest()->get() : collect();
+    }
+
+    public function canManage(): bool
+    {
+    $user = Auth::user();
+        $team = $this->getTeam();
+        return $user && $team && $user->hasAnyRole(['Admin','Manager']);
+    }
+
+    // Add member management logic here (invite, remove, change role)
+
+    public function form(Form $form): Form
+    {
         return $form
             ->schema([
                 TextInput::make('name'),
@@ -113,6 +148,18 @@ class EditTeamProfile extends EditTenantProfile {
                         TextInput::make('email')->label('Contact Email')->email()->placeholder('contact@mail.com')->nullable(),
                         TextInput::make('phone')->label('Contact Phone')->mask('(999) 999-9999')->nullable(),
                     ])->collapsible(),
+
+                Section::make('Team Members')
+                    ->schema([
+                        \Filament\Forms\Components\View::make('filament.settings.team.members')
+                            ->viewData([
+                                'members' => fn() => $this->getMembers(),
+                                'invitations' => fn() => $this->getInvitations(),
+                                'canManage' => fn() => $this->canManage(),
+                                'team' => fn() => $this->getTeam(),
+                            ]),
+                    ])
+                    ->collapsible(),
             ]);
     }
 }

@@ -16,10 +16,12 @@ $brandLogo = asset('/storage/Tripsittr Logo.png');
     @endif
 
     <div class="mx-auto w-full max-w-2xl">
-
-        <x-filament::section>
-            <x-slot name="heading">Welcome</x-slot>
-            <x-slot name="description">Tell us a bit about you and set up your account.</x-slot>
+        <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div class="mb-4">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Welcome</h2>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Tell us a bit about you and set up your
+                    account.</p>
+            </div>
 
             <x-filament-panels::form id="form" wire:submit="register" class="space-y-6">
                 {{ $this->form }}
@@ -27,11 +29,9 @@ $brandLogo = asset('/storage/Tripsittr Logo.png');
                 <x-filament-panels::form.actions :actions="$this->getCachedFormActions()"
                     :full-width="$this->hasFullWidthFormActions()" />
             </x-filament-panels::form>
-        </x-filament::section>
+        </div>
 
-        <br>
-        <hr class="bg-black" />
-        <br>
+        <div class="my-8 h-px w-full bg-gray-200 dark:bg-gray-800"></div>
 
         <div class="text-center text-sm text-gray-500 dark:text-gray-400">
             By creating an account, you agree to our
