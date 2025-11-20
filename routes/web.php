@@ -217,6 +217,7 @@ Route::get('/auth/{provider}', function ($provider) {
             ]);
         }
 
+        /** @var \Laravel\Socialite\Two\AbstractProvider $socialDriver */
         $socialDriver = Socialite::driver('facebook');
 
         return $socialDriver
@@ -259,21 +260,30 @@ Route::get('/auth/{provider}/callback', function ($provider) {
                     'services.facebook.redirect' => env('INSTAGRAM_OAUTH_REDIRECT', config('services.facebook.redirect')),
                 ]);
             }
+            /** @var \Laravel\Socialite\Two\AbstractProvider $socialDriver */
+            $socialDriver = Socialite::driver('facebook');
 
-            $socialUser = Socialite::driver('facebook')->user();
+            $socialUser = $socialDriver->user();
             $persistProvider = 'instagram';
         } else {
-            $socialUser = Socialite::driver($provider)->user();
+            /** @var \Laravel\Socialite\Two\AbstractProvider $socialDriver */
+            $socialDriver = Socialite::driver($provider);
+
+            $socialUser = $socialDriver->user();
             $persistProvider = $provider;
         }
     } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
         // Session state missing/mismatched — retry once in stateless mode.
         try {
             if ($provider === 'instagram') {
-                $socialUser = Socialite::driver('facebook')->stateless()->user();
+                /** @var \Laravel\Socialite\Two\AbstractProvider $socialDriver */
+                $socialDriver = Socialite::driver('facebook');
+                $socialUser = $socialDriver->stateless()->user();
                 $persistProvider = 'instagram';
             } else {
-                $socialUser = Socialite::driver($provider)->stateless()->user();
+                /** @var \Laravel\Socialite\Two\AbstractProvider $socialDriver */
+                $socialDriver = Socialite::driver($provider);
+                $socialUser = $socialDriver->stateless()->user();
                 $persistProvider = $provider;
             }
         } catch (\Throwable $e) {
