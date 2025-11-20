@@ -1,34 +1,28 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Filament\Index\Traits\BlacklistedWordsTrait;
+use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
-use Spatie\Permission\Traits\HasRoles;
-use App\Traits\BlacklistedWordsTrait;
-use Filament\Facades\Filament;
 use Laravel\Cashier\Billable;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenants
+
+class User extends Authenticatable implements FilamentUser, HasAvatar, HasTenants
 {
     use HasFactory, Notifiable, SoftDeletes;
-    use HasRoles;
-    use BlacklistedWordsTrait;
-    use Billable; // Enable Cashier subscription & billing methods
-
+    use HasRoles; // Enable Cashier subscription & billing methods
 
     public function getDefaultTenant(Panel $panel): ?Model
     {
@@ -61,12 +55,13 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenant
         if ($this->type === 'Admin' || $this->hasRole('Admin')) {
             return true;
         }
+
         return $this->teams()->whereKey($tenant)->exists();
     }
 
     public function isTeamAdmin(Team $team): bool
     {
-        return $this->hasRole('Admin') && $this->teams()->where('teams.id',$team->id)->exists();
+        return $this->hasRole('Admin') && $this->teams()->where('teams.id', $team->id)->exists();
     }
 
     public function canAccessPanel(Panel $panel): bool
@@ -147,8 +142,14 @@ class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenant
         if ($this->relationLoaded('teams') && $this->teams->isNotEmpty()) {
             return $this->teams->first();
         }
+
         // Query for first team membership
         return $this->teams()->first();
+    }
+
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(SocialAccount::class);
     }
 
     // Backwards compatibility helper (method style)

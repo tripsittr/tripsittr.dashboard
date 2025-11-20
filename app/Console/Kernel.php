@@ -11,6 +11,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('inventory:check-low-stock')->hourly();
         $schedule->command('music:process-album-releases')->everyFifteenMinutes();
+        // Refresh Facebook/Instagram tokens daily (refresh tokens expiring within 7 days)
+        $schedule->command('social:facebook:refresh --days=7')->daily();
     }
 
     protected function commands(): void

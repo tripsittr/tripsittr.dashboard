@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use App\Traits\BlacklistedWordsTrait;
+use App\Filament\Index\Traits\BlacklistedWordsTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Venue extends Model {
-    use HasFactory, SoftDeletes, BlacklistedWordsTrait;
+class Venue extends Model
+{
+    use BlacklistedWordsTrait, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -97,7 +98,8 @@ class Venue extends Model {
         'public_transit_access' => 'boolean',
     ];
 
-    public function getBlacklistedFields(): array {
+    public function getBlacklistedFields(): array
+    {
         return array_merge($this->fillable, ['name', 'description']);
     }
 }

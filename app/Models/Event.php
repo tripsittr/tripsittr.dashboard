@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use App\Models\Team;
 
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -35,7 +35,7 @@ class Order extends Model
 
     public function team(): BelongsTo
     {
-        return $this->belongsTo(Team::class);
+    return $this->belongsTo(\App\Models\Team::class);
     }
 
     public function customer(): BelongsTo

@@ -15,9 +15,13 @@ return [
     */
 
     'facebook' => [
-        'client_id' => env('INSTAGRAM_CLIENT_ID'),
-        'client_secret' => env('INSTAGRAM_CLIENT_SECRET'),
-        'redirect' => env('INSTAGRAM_REDIRECT_URI'),
+        // Facebook app credentials (used for Facebook Login and Instagram Business Graph API)
+        'client_id' => env('FACEBOOK_APP_ID'),
+        'client_secret' => env('FACEBOOK_APP_SECRET'),
+        // The redirect URI used for the Socialite callback. Example: https://your-app.com/auth/facebook/callback
+        'redirect' => env('FACEBOOK_REDIRECT_URI'),
+        // Graph API version to target (e.g. v17.0)
+        'graph_version' => env('GRAPH_API_VERSION', 'v17.0'),
         'stateless' => true,
     ],
     'spotify' => [

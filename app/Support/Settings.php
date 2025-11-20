@@ -8,6 +8,14 @@ use Illuminate\Support\Facades\Schema;
 
 class Settings
 {
+    /**
+     * Return a default settings URL (stub implementation).
+     */
+    public static function getUrl(): string
+    {
+        // You can customize this logic as needed
+        return url('/settings');
+    }
     protected static string $cacheKey = 'app_settings_cache_v1';
     protected static bool $loaded = false;
     protected static array $items = [];

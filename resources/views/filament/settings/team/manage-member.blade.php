@@ -14,9 +14,6 @@ $directPerms = $member->permissions->pluck('name')->sort()->values()->implode(',
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Configure role & permissions for <strong>{{
                         $member->name }}</strong></p>
             </div>
-            <x-filament::button tag="a"
-                :href="route('filament.admin.settings.pages.team-members', ['tenant' => $team?->id])" color="gray">Back
-            </x-filament::button>
         </div>
 
         <div class="grid gap-6 md:grid-cols-3">
@@ -64,13 +61,53 @@ $directPerms = $member->permissions->pluck('name')->sort()->values()->implode(',
                     @endforeach
                 </fieldset>
                 <div class="space-y-2">
-                    <label class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Extra
-                        Permissions</label>
-                    <input type="text" name="permissions" value="{{ $directPerms }}"
-                        placeholder="upload-media, manage-store"
-                        class="fi-input block w-full rounded border-gray-300 dark:bg-gray-800 dark:border-gray-600 text-sm" />
-                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Comma separated list. New permissions are
-                        created automatically for this team.</p>
+                    @php
+                    $allPermissions = \Spatie\Permission\Models\Permission::orderBy('name')->pluck('name');
+                    $memberPermissions = $member->permissions->pluck('name')->toArray();
+                    // Group permissions by function/entity (split by last word)
+                    $groupedPermissions = collect($allPermissions)->groupBy(function($perm) {
+                    $parts = explode(' ', $perm);
+                    return array_pop($parts);
+                    });
+                    @endphp
+                    <x-filament::button type="button" color="primary" x-data x-on:click="$refs.permModal.showModal()">
+                        Edit Permissions
+                    </x-filament::button>
+                    <dialog x-ref="permModal"
+                        class="rounded-lg shadow-lg w-full max-w-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-4 md:pl-16 md:pr-10 md:pt-10 md:pb-10"
+                        @close.window="$el.close()">
+                        <form method="post" action="{{ route('team.member.roles', $member) }}"
+                            class="space-y-4 p-6 md:pl-12 md:pr-6 md:pt-6 md:pb-6" @submit.prevent="$el.close()">
+                            @csrf
+                            @method('put')
+                            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Edit
+                                Permissions
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-80 overflow-y-auto">
+                                @foreach($groupedPermissions as $entity => $perms)
+                                <div class="pl-4 md:pl-8">
+                                    <div class="font-semibold text-xs uppercase text-gray-500 dark:text-gray-400 mb-1">
+                                        {{ ucfirst($entity) }}</div>
+                                    <div class="space-y-1">
+                                        @foreach($perms as $permission)
+                                        <label class="flex items-center gap-2 text-sm px-2 py-1">
+                                            <input type="checkbox" name="permissions[]" value="{{ $permission }}"
+                                                @if(in_array($permission, $memberPermissions)) checked @endif
+                                                class="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary" />
+                                            <span>{{ $permission }}</span>
+                                        </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            <div class="flex justify-end gap-2 mt-4">
+                                <x-filament::button type="button" color="secondary" @click="$refs.permModal.close()">
+                                    Close</x-filament::button>
+                                <x-filament::button type="submit" color="primary">Save</x-filament::button>
+                            </div>
+                        </form>
+                    </dialog>
                 </div>
             </div>
             <div class="flex items-center justify-between">

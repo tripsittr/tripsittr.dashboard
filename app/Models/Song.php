@@ -2,20 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Filament\Index\Traits\BlacklistedWordsTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
-use App\Traits\BlacklistedWordsTrait;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-class Song extends Model {
-    use HasFactory;
+class Song extends Model
+{
     use BlacklistedWordsTrait;
+
+    // use BlacklistedWordsTrait;
     use SoftDeletes;
 
     protected $fillable = [
@@ -79,21 +77,43 @@ class Song extends Model {
     /**
      * Accessor helpers to always return an array (never null) for repeater-like attributes.
      */
-    public function getPrimaryArtistsAttribute($value) { return $this->decodeRepeater($value); }
-    public function getFeaturedArtistsAttribute($value) { return $this->decodeRepeater($value); }
-    public function getProducersAttribute($value) { return $this->decodeRepeater($value); }
-    public function getComposersAttribute($value) { return $this->decodeRepeater($value); }
-    public function getCurrentOwnersAttribute($value) { return $this->decodeRepeater($value); }
+    public function getPrimaryArtistsAttribute($value)
+    {
+        return $this->decodeRepeater($value);
+    }
+
+    public function getFeaturedArtistsAttribute($value)
+    {
+        return $this->decodeRepeater($value);
+    }
+
+    public function getProducersAttribute($value)
+    {
+        return $this->decodeRepeater($value);
+    }
+
+    public function getComposersAttribute($value)
+    {
+        return $this->decodeRepeater($value);
+    }
+
+    public function getCurrentOwnersAttribute($value)
+    {
+        return $this->decodeRepeater($value);
+    }
 
     /**
      * Return a normalized storage-relative path for the audio file (strip leading slashes or storage/ prefix).
      */
     public function normalizedSongFile(): ?string
     {
-        if (!$this->song_file) { return null; }
+        if (! $this->song_file) {
+            return null;
+        }
         $p = ltrim($this->song_file, '/');
         // Strip accidental 'storage/' prefix (public disk symlink)
-        $p = preg_replace('#^storage/#','', $p);
+        $p = preg_replace('#^storage/#', '', $p);
+
         return $p;
     }
 
@@ -103,7 +123,9 @@ class Song extends Model {
     public function getSongFileUrlAttribute(): ?string
     {
         $rel = $this->normalizedSongFile();
-        if (!$rel) { return null; }
+        if (! $rel) {
+            return null;
+        }
         try {
             return Storage::url($rel);
         } catch (\Throwable $e) {
@@ -117,15 +139,20 @@ class Song extends Model {
     public function resolveSongAbsolutePath(): ?string
     {
         $rel = $this->normalizedSongFile();
-        if (!$rel) { return null; }
+        if (! $rel) {
+            return null;
+        }
         $candidates = [
             storage_path('app/public/'.$rel),
             public_path('storage/'.$rel),
             storage_path('app/private/'.$rel),
         ];
         foreach ($candidates as $c) {
-            if (is_file($c)) { return $c; }
+            if (is_file($c)) {
+                return $c;
+            }
         }
+
         return null;
     }
 
@@ -137,7 +164,8 @@ class Song extends Model {
      *  - Plain string => wrap as [['name' => string]]
      *  - Already array => returned as-is (ensuring each scalar converted to ['name'=>...])
      */
-    private function decodeRepeater($value): array {
+    private function decodeRepeater($value): array
+    {
         if ($value === null || $value === '') {
             return [];
         }
@@ -153,48 +181,55 @@ class Song extends Model {
             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                 return $this->normalizeRepeaterArray($decoded);
             }
+
             // Fallback treat raw string as a single name entry
-            return [[ 'name' => trim($value) ]];
+            return [['name' => trim($value)]];
         }
 
         return [];
     }
 
-    private function normalizeRepeaterArray(array $value): array {
+    private function normalizeRepeaterArray(array $value): array
+    {
         // If array is list of scalars, convert to name entries
-        if (array_is_list($value) && (empty($value) || !is_array($value[0] ?? null))) {
-            return array_map(fn($v) => ['name' => is_scalar($v) ? (string)$v : ''], $value);
+        if (array_is_list($value) && (empty($value) || ! is_array($value[0] ?? null))) {
+            return array_map(fn ($v) => ['name' => is_scalar($v) ? (string) $v : ''], $value);
         }
         // If each element has a 'name' key, assume correct structure
-        if (!empty($value) && array_key_exists('name', $value[0] ?? [])) {
+        if (! empty($value) && array_key_exists('name', $value[0] ?? [])) {
             return $value;
         }
         // Mixed associative: map key/value into name entries
         $normalized = [];
         foreach ($value as $k => $v) {
             if (is_array($v) && array_key_exists('name', $v)) {
-                $normalized[] = ['name' => (string)$v['name']];
+                $normalized[] = ['name' => (string) $v['name']];
             } elseif (is_scalar($v)) {
-                $normalized[] = ['name' => (string)$v];
+                $normalized[] = ['name' => (string) $v];
             }
         }
+
         return $normalized;
     }
 
-    public function album() {
+    public function album()
+    {
         return $this->belongsTo(Album::class);
     }
 
-    public function team(): BelongsTo {
+    public function team(): BelongsTo
+    {
         return $this->belongsTo(Team::class);
     }
 
-    public function scopeForTenant($query, $tenantId) {
+    public function scopeForTenant($query, $tenantId)
+    {
         return $query->where('tenant_id', $tenantId);
     }
 
     // Add logging to the model's boot method
-    protected static function boot() {
+    protected static function boot()
+    {
         parent::boot();
 
         static::retrieved(function ($song) {
@@ -207,10 +242,10 @@ class Song extends Model {
         });
     }
 
-    protected static function booted() {
-    }
+    protected static function booted() {}
 
-    public function getBlacklistedFields(): array {
+    public function getBlacklistedFields(): array
+    {
         return array_merge($this->fillable, ['name', 'description']);
     }
 }
