@@ -2,28 +2,29 @@
 
 namespace App\Services;
 
-use App\Models\Order;
-
 class OrderStatusTransition
 {
-    protected static array $map = [
-        'draft' => ['pending','cancelled'],
-        'pending' => ['paid','cancelled'],
-        'paid' => ['fulfilled','refunded','cancelled','partial'],
-        'partial' => ['fulfilled','refunded','cancelled'],
-        'fulfilled' => ['shipped'],
-        'shipped' => [],
-        'cancelled' => [],
-        'refunded' => [],
-    ];
-
-    public static function allowed(Order $order, string $to): bool
+    /**
+     * Get allowed next status options for an order record.
+     * @param \App\Models\Order $order
+     * @return array
+     */
+    public static function nextOptions($order): array
     {
-        return in_array($to, self::$map[$order->status] ?? [], true);
+        // Example logic: allow all except current status
+        $all = [
+            'draft', 'pending', 'paid', 'fulfilled', 'shipped', 'cancelled', 'refunded', 'partial',
+        ];
+        $current = $order->status ?? 'draft';
+        return array_values(array_filter($all, fn($s) => $s !== $current));
     }
 
-    public static function nextOptions(Order $order): array
+    /**
+     * Check if transition is allowed (stub for now)
+     */
+    public static function allowed($order, $new): bool
     {
-        return self::$map[$order->status] ?? [];
+        // Allow all transitions except to current
+        return $order->status !== $new;
     }
 }

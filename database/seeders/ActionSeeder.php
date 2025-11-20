@@ -64,6 +64,42 @@ class ActionSeeder extends Seeder
             ['action_title' => 'Create Venue', 'action_type' => 'create_venue'],
             ['action_title' => 'Update Venue', 'action_type' => 'update_venue'],
             ['action_title' => 'Delete Venue', 'action_type' => 'delete_venue'],
+            // Additional suggested actions
+            ['action_title' => 'Invite Team Member',      'action_type' => 'invite_team_member'],
+            ['action_title' => 'Remove Team Member',      'action_type' => 'remove_team_member'],
+            ['action_title' => 'Assign Role',             'action_type' => 'assign_role'],
+            ['action_title' => 'Revoke Role',             'action_type' => 'revoke_role'],
+
+            ['action_title' => 'Unfeature Song',          'action_type' => 'unfeature_song'],
+            ['action_title' => 'Release Album',           'action_type' => 'release_album'],
+            ['action_title' => 'Unrelease Album',         'action_type' => 'unrelease_album'],
+            ['action_title' => 'Add Track to Playlist',   'action_type' => 'add_track_to_playlist'],
+            ['action_title' => 'Remove Track From Playlist','action_type' => 'remove_track_from_playlist'],
+
+            ['action_title' => 'Create Order',            'action_type' => 'create_order'],
+            ['action_title' => 'Update Order',            'action_type' => 'update_order'],
+            ['action_title' => 'Cancel Order',            'action_type' => 'cancel_order'],
+            ['action_title' => 'Refund Order',            'action_type' => 'refund_order'],
+            ['action_title' => 'Capture Payment',         'action_type' => 'capture_payment'],
+            ['action_title' => 'Create Customer',         'action_type' => 'create_customer'],
+            ['action_title' => 'Update Customer',         'action_type' => 'update_customer'],
+            ['action_title' => 'Delete Customer',         'action_type' => 'delete_customer'],
+            ['action_title' => 'Create Catalog Item',     'action_type' => 'create_catalog_item'],
+            ['action_title' => 'Update Catalog Item',     'action_type' => 'update_catalog_item'],
+            ['action_title' => 'Delete Catalog Item',     'action_type' => 'delete_catalog_item'],
+            ['action_title' => 'Export Orders',           'action_type' => 'export_orders'],
+            ['action_title' => 'Export Customers',        'action_type' => 'export_customers'],
+
+            ['action_title' => 'Publish Knowledge',       'action_type' => 'publish_knowledge'],
+            ['action_title' => 'Unpublish Knowledge',     'action_type' => 'unpublish_knowledge'],
+            ['action_title' => 'Archive Knowledge',       'action_type' => 'archive_knowledge'],
+
+            ['action_title' => 'Create Approval',         'action_type' => 'create_approval'],
+            ['action_title' => 'Approve Item',            'action_type' => 'approve_item'],
+            ['action_title' => 'Reject Item',             'action_type' => 'reject_item'],
+
+            ['action_title' => 'View Analytics',          'action_type' => 'view_analytics'],
+            ['action_title' => 'Export Report',           'action_type' => 'export_report'],
         ];
 
         DB::table('action')->insert($actions);

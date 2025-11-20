@@ -2,19 +2,24 @@
 
 namespace App\Models;
 
-use App\Traits\BlacklistedWordsTrait;
+use App\Models\ActivityLog;
+use App\Models\Album;
+use App\Models\CatalogItem;
+use App\Models\Customer;
+use App\Models\InventoryItem;
+use App\Models\Invitation;
+use App\Models\Order;
+use App\Models\Song;
+use App\Models\User;
+use App\Models\UserAction;
+use App\Filament\Index\Traits\BlacklistedWordsTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Cashier\Billable;
-use App\Models\CatalogItem;
-use App\Models\InventoryItem;
-use App\Models\Customer;
-use App\Models\Order;
-use App\Models\ActivityLog;
 use Illuminate\Support\Facades\DB;
+use Laravel\Cashier\Billable;
 
 class Team extends Model
 {
@@ -113,12 +118,13 @@ class Team extends Model
     public function planConfig(): ?array
     {
         $plans = config('plans.plans');
+
         return $plans[$this->plan_slug] ?? ($plans[config('plans.default_plan')] ?? null);
     }
 
     public function maxSeats(): int
     {
-        return (int)($this->planConfig()['seats'] ?? 1);
+        return (int) ($this->planConfig()['seats'] ?? 1);
     }
 
     public function usedSeats(): int
@@ -152,6 +158,7 @@ class Team extends Model
                 $removed += DB::table('team_user')->whereIn('id', $toDelete)->delete();
             }
         }
+
         return $removed;
     }
 

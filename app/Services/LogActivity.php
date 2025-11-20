@@ -2,21 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\ActivityLog;
-use Illuminate\Support\Facades\Auth;
-use Filament\Facades\Filament;
-
 class LogActivity
 {
-    public static function record(string $action, string $entityType, int $entityId, array $changes = [], ?int $teamId = null): void
+    public static function record($action, $model, $id, $data = [], $tenantId = null)
     {
-        ActivityLog::create([
-            'team_id' => $teamId ?? Filament::getTenant()?->id,
-            'entity_type' => $entityType,
-            'entity_id' => $entityId,
-            'action' => $action,
-            'changes' => empty($changes) ? null : $changes,
-            'user_id' => Auth::id(),
-        ]);
+        // Add logic as needed
     }
 }

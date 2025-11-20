@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Filament\Index\Observers;
 use App\Models\Address;
 use App\Models\Album;
 use App\Models\CatalogItem;
@@ -18,7 +19,6 @@ use App\Models\TeamUser;
 use App\Models\User;
 use App\Models\Venue;
 use App\Observers\BaseModelObserver;
-use App\Observers\UserObserver;
 use App\Policies\AlbumPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\SongPolicy;
@@ -35,7 +35,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+
+        $this->app->bind('path.public', function () {
+
+            return base_path().'/public_html';
+
+        });
+
     }
 
     /**
@@ -48,19 +54,19 @@ class AppServiceProvider extends ServiceProvider
         Cashier::calculateTaxes();
 
         // Observers (specific)
-        User::observe(UserObserver::class);
-        Song::observe(\App\Observers\SongObserver::class);
-        Album::observe(\App\Observers\AlbumObserver::class);
+        User::observe(Observers\UserObserver::class);
+        Song::observe(Observers\SongObserver::class);
+        Album::observe(Observers\AlbumObserver::class);
 
         // Policies
         Gate::policy(Album::class, AlbumPolicy::class);
         Gate::policy(Song::class, SongPolicy::class);
         Gate::policy(SpatieRole::class, RolePolicy::class);
-        Event::observe(\App\Observers\EventObserver::class);
+        Event::observe(Observers\EventObserver::class);
 
         // Generic observer for remaining models (skip those with custom logic or potential recursion issues)
         foreach ([
-            Address::class,
+            // Address::class,
             CatalogItem::class,
             Customer::class,
             InventoryItem::class,
@@ -68,7 +74,7 @@ class AppServiceProvider extends ServiceProvider
             Knowledge::class,
             Order::class,
             OrderItem::class,
-            TeamUser::class,
+            // TeamUser::class,
             Venue::class,
         ] as $modelClass) {
             $modelClass::observe(BaseModelObserver::class);

@@ -23,16 +23,16 @@ class OrderItem extends Model
 
     public function order(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+    return $this->belongsTo(\App\Models\Order::class);
     }
 
     public function inventoryItem(): BelongsTo
     {
-        return $this->belongsTo(InventoryItem::class);
+    return $this->belongsTo(\App\Models\InventoryItem::class);
     }
 
     public function catalogItem(): BelongsTo
     {
-        return $this->belongsTo(CatalogItem::class);
+    return $this->belongsTo(\App\Models\CatalogItem::class);
     }
 }

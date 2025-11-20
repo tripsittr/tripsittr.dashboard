@@ -102,7 +102,7 @@ $seatPct = $maxSeats > 0 ? min(100, round(($usedSeats / $maxSeats) * 100)) : 0;
                                 <td class="px-3 py-2">
                                     <div class="flex flex-wrap gap-2">
                                         <x-filament::button tag="a" size="xs" color="gray"
-                                            href="{{ \App\Filament\Clusters\Settings\Pages\ManageMember::getUrl(['member' => $member]) }}">
+                                            href="{{ \App\Filament\Artists\Clusters\Settings\Pages\ManageMember::getUrl(['member' => $member]) }}">
                                             Manage</x-filament::button>
                                         @if($member->id !== $user->id)
                                         <x-filament::button size="xs" color="danger" x-data

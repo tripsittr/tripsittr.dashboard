@@ -3,17 +3,23 @@
 return [
 
     'panels' => [
+        'artists' => [
+            'id' => 'artists',
+            'path' => 'artists',
+            'guard' => 'filament',
+            'middleware' => ['auth:filament'],
+        ],
         'admin' => [
             'id' => 'admin',
             'path' => 'admin',
             'guard' => 'filament',
             'middleware' => ['auth:filament'],
         ],
-        'user' => [
-            'id' => 'user',
-            'path' => 'dashboard',
-            'guard' => 'web',
-            'middleware' => ['auth', 'subscription'],
+        'venues' => [
+            'id' => 'venues',
+            'path' => 'venues',
+            'guard' => 'filament',
+            'middleware' => ['auth:filament'],
         ],
     ],
 

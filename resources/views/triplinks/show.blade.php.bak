@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{!! $trip->title !!}</title>
+</head>
+
+@php
+$design = $trip->design ?? [];
+$primaryColor = $design['primary_color'] ?? '#0ea5a5';
+$textColor = $design['text_color'] ?? '#111827';
+@endphp
+
+<body>
+    <div id="tl-header">
+        <img src="{{ $trip->banner_image }}" alt="Banner Image"">
+    </div>
+</body>
+
+</html>

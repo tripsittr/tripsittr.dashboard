@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Models;
+use App\Models\Team;
+use App\Models\InventoryItem;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

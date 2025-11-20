@@ -2,9 +2,9 @@
 
 namespace App\Http\Integrations\SpotifyConnector;
 
+use App\Filament\Index\Services\SpotifyService;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
-use App\Services\SpotifyService;
 
 class SpotifyConnector extends Connector
 {
@@ -24,7 +24,7 @@ class SpotifyConnector extends Connector
     protected function defaultHeaders(): array
     {
         return [
-            'Authorization' => 'Bearer ' . (new SpotifyService())->getSpotifyAccessToken(),
+            'Authorization' => 'Bearer '.(new SpotifyService)->getSpotifyAccessToken(),
         ];
     }
 }

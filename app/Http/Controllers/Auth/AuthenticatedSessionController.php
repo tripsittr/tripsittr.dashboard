@@ -28,6 +28,34 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // If a social OAuth pending payload exists from a prior callback (user
+        // completed OAuth but was not authenticated), attach a placeholder
+        // SocialAccount to the now-authenticated user so the admin can finish
+        // the linking in the Social Connections settings UI.
+        $pending = $request->session()->pull('social_oauth_pending');
+        if (! empty($pending)) {
+            try {
+                $user = $request->user();
+                if ($user) {
+                    $meta = [
+                        'name' => $pending['name'] ?? null,
+                        'email' => $pending['email'] ?? null,
+                        'avatar' => $pending['avatar'] ?? null,
+                    ];
+
+                    $user->socialAccounts()->updateOrCreate(
+                        ['provider' => $pending['provider']],
+                        [
+                            'provider_id' => $pending['provider_id'] ?? null,
+                            'meta' => $meta,
+                        ]
+                    );
+                }
+            } catch (\Throwable $e) {
+                logger()->warning('Failed to auto-attach pending social payload after login', ['exception' => $e]);
+            }
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
